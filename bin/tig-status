@@ -1,0 +1,55 @@
+#!/bin/bash
+#
+# Gets the current status of the module (git)
+
+. $HOME/.tigrc
+
+### if no arguments, throw an error
+if [ $# -eq 0 ]; then
+  >&2 echo "${RED}--Must specify a module to check status for...--${NC}"
+  exit 1
+fi
+
+module_name=$1
+module_dir=${2-$module_name}
+module_root="$MODULE_ROOT/$module_dir"
+module_url="$GITHUB_URL_TIX/$module_name"
+
+
+### if module not cloned, throw an error
+if [ ! -d $module_root ]; then
+  >&2 echo -e "${RED}--Module $module_name does not exist at $module_root...--${NC}"
+  exit 1
+fi
+
+pushd $module_root >/dev/null
+  status=$(git status 2>&1)
+  ahead_str="\t"
+  if [[ $status == *"ahead"* ]] ; then
+    ahead_str="|A$(echo $status | grep ahead | tr '\n' ' ' | sed -e 's/[^0-9]/ /g' -e 's/^ *//g' -e 's/ *$//g' | tr -s ' ' | sed 's/ /\n/g')|\t"
+  fi
+  status_start="${ahead_str}${module_name}"
+  name_length=${#module_name}
+  post_spacer="\t\t\t"
+  if [ $name_length -lt 10 ] ; then
+    post_spacer="\t\t\t\t"
+  fi
+
+  case "$status" in
+    *modified*|*deleted*|*Untracked\ files*)
+      status_porcelain=$(git status --porcelain)
+      modified_count=$(echo "$status_porcelain" | grep ' M ' | wc -l | tr -d ' ')
+      deleted_count=$(echo "$status_porcelain" | grep ' D ' | wc -l | tr -d ' ')
+      untracked_count=$(echo "$status_porcelain" | grep '?? ' | wc -l | tr -d ' ')
+
+
+      >&2 echo -e "${RED}${status_start} dirty${post_spacer}|M$modified_count|D$deleted_count|U$untracked_count|${NC}"
+      ;;
+    *ahead*)
+      >&2 echo -e "${PURPLE}${status_start} clean but ahead${NC}"
+      ;;
+    *)
+      >&2 echo -e "${status_start} clean"
+      ;;
+  esac
+popd >/dev/null

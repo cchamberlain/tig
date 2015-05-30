@@ -1,0 +1,37 @@
+#!/bin/bash
+#
+# This script installs required applications
+
+. $HOME/.tixrc
+
+>&2 echo "--Installing Required Applications--"
+if ! hash rimraf 2>/dev/null; then
+  >&2 echo "--Installing rimraf--"
+  >&2 echo "--**short for 'rm -rf' (remove recursive/force)**--"
+  npm install -g rimraf >/dev/null
+fi
+if ! hash mkdirp 2>/dev/null; then
+  >&2 echo "--Installing mkdirp--"
+  >&2 echo "--**short for 'mkdir -p' (make directory recursively and skip silently if directory exists)**--"
+  npm install -g mkdirp >/dev/null
+fi
+if ! hash nodemon 2>/dev/null; then
+  >&2 echo "--Installing nodemon--"
+  >&2 echo "--**runs node.js and watches server-side files for updates to trigger process reload**--"
+  npm install -g nodemon >/dev/null
+fi
+if ! hash forever 2>/dev/null; then
+  >&2 echo "--Installing forever--"
+  >&2 echo "--**runs node.js in a production setting, ensuring the process never goes down**--"
+  npm install -g forever >/dev/null
+fi
+if ! hash gulp 2>/dev/null; then
+  >&2 echo "--Installing gulp--"
+  npm install -g gulp >/dev/null
+fi
+if ! hash chrome 2>/dev/null; then
+  >&2 echo "--Installing chrome--"
+  if [ "$PNAME" = "windows" ]; then
+    choco install google-chrome-x64
+  fi
+fi

@@ -1,0 +1,75 @@
+#!/bin/bash
+#
+# This script prepares the tix-cli dependencies and starts it.
+
+
+set -e
+OPTIND=1
+
+CONFIG_PATH=$HOME/.tigrc
+if [ -f "$CONFIG_PATH" ] ; then
+  . $CONFIG_PATH
+fi
+
+# Define flags
+rewrite_tixrc=false
+install_required=false
+install_optional=false
+clean_install=false
+install_extended=false
+non_interactive=false
+
+usage_short="${CYAN}Usage: tig [-r] [-i] [-o] [-c] [-x] [-n]${NC}"
+usage_long="$usage_short\n-r: Rewrite ~/.tixrc configuration file."
+usage_long="$usage_long\n-i: Install required dependencies."
+usage_long="$usage_long\n-o: Install optional dependencies."
+usage_long="$usage_long\n-c: Clean installation directories."
+usage_long="$usage_long\n-x: Install extended cli."
+usage_long="$usage_long\n-n: Run commands and exit."
+
+usage_short="$usage_short\nUse -h to get supported command information."
+
+options=":riocxnh"
+
+### Command line flags
+while getopts "$options" opt; do
+    case "$opt" in
+    r ) ### Rewrites the tixrc file
+      rewrite_tixrc=true
+      ;;
+    i ) ### Install required applications
+      install_required=true
+      ;;
+    o ) ### Install optional files
+      install_optional=true
+      ;;
+    c ) ### Clean install directories
+      clean_install=true
+      ;;
+    x ) ### Install extended mode
+      install_extended=true
+      ;;
+    n ) ### Skip running.
+      non_interactive=true
+    ;;
+    h )
+      >&2 echo -e "$usage_long" && exit 1
+      exit 0
+      ;;
+    \?)
+      >&2 echo -e "Unknown option: -$OPTARG"
+      >&2 echo -e "$usage_short"
+      exit 1
+      ;;
+    : )
+      >&2 echo -e "Missing option argument for -$OPTARG"
+      >&2 echo -e "$usage_short"
+      exit 1
+      ;;
+    * )
+      >&2 echo -e "Unimplemented option: -$OPTARG" && exit 1
+      >&2 echo -e "$usage_short"
+      exit 1
+    esac
+    shift $((OPTIND-1))
+done
