@@ -6,7 +6,7 @@ set -e
 OPTIND=1
 
 CONFIG_PATH=$HOME/.tigrc
-if [ -f "$CONFIG_PATH" ] ; then
+if [ ! -f "$CONFIG_PATH" ] ; then
   # Install required dependencies with init flag
   tig-install -ir
   . $CONFIG_PATH
@@ -29,7 +29,7 @@ usage_long="$usage_long\n\tdeploy: Mesh, build, compress, and deploy artifacts t
 usage_short="$usage_short\nUse -h to get supported command information."
 
 if [ "$#" == "0" ] ; then
-  >&2 echo "$usage_short"
+  >&2 echo -e "$usage_short"
   exit 1
 fi
 

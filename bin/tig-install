@@ -2,8 +2,9 @@
 #
 # This script installs required applications
 
-. $HOME/.tigrc
+cp $HOME/src/tig/lib/tigrc $HOME/.tigrc
 
+. $HOME/.tigrc
 
 >&2 echo "--Installing Required Applications--"
 if ! hash rimraf 2>/dev/null; then

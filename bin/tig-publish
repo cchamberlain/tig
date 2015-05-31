@@ -1,0 +1,43 @@
+#!/bin/bash
+#
+# Git adds, commits, npm version, npm publishes, and git pushes the specified module directory.
+
+. $HOME/.tigrc
+
+### if no arguments, throw an error
+if [ $# -eq 0 ]; then
+  >&2 echo "Must specify a module directory and commit message to publish..."
+  exit 1
+fi
+
+if [ $# -eq 1 ]; then
+  >&2 echo "Must specify a commit message..."
+  exit 1
+fi
+
+module_dir=$1
+commit_message=$2
+skip_npm=${3-false}
+module_path="$MODULE_ROOT/$module_dir"
+
+### if module already cloned, throw an error
+if [ ! -d "$module_path" ]; then
+  >&2 "echo Module $module_dir does not exist at $module_path..."
+  exit 1
+fi
+
+>&2 echo "publishing $module_dir at $module_path..."
+
+pushd $module_path >/dev/null
+
+git add -A  #| grep -qi "fatal" && >&2 echo "An error occurred while git adding." && exit 1
+git commit -am "$commit_message"  #| grep -qi "fatal" && >&2 echo "An error occurred while git committing." && exit 1
+npm version patch -m "$commit_message"   #| grep -qi "fatal" && >&2 echo "An error occurred while npm versioning." && exit 1
+if [ "$skip_npm" = false ]; then
+  npm publish  #| grep -qi "fatal" && >&2 echo "An error occurred while npm publishing." && exit 1
+fi
+git push --follow-tags #| grep -qi "fatal" && >&2 echo "An error occurred while git pushing to master." && exit 1
+
+popd >/dev/null
+
+>&2 echo "NPM published $module_dir and changes pushed successfully!"
