@@ -3,6 +3,8 @@ logs
 *.log
 .idea
 
+*.msi
+
 # Runtime data
 pids
 *.pid

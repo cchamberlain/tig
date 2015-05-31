@@ -85,10 +85,14 @@ export NPMRC_PATH="${HOME}/.npmrc"
 export TIGRC_PATH="${HOME}/.tigrc"
 
 # All source code gets installed here by default
-export TIG_ROOT="${HOME}/src"
+export SRC_ROOT="${HOME}/src"
+export SRC_BIN_ROOT="${SRC_ROOT}/bin"
+
+export LOCAL_ROOT="${HOME}/local"
+export LOCAL_BIN_ROOT="${LOCAL_ROOT}/bin"
+export TIG_ROOT="${LOCAL_ROOT}/tig"
 
 # Code being prepared for build and other tasks gets synced here
-#
 export SYNC_ROOT="${TIG_ROOT}/sync"
 
 # After code revision has been synced, it is built to this directory.
@@ -97,5 +101,4 @@ export BUILD_ROOT="${TIG_ROOT}/build"
 
 # After code has been built, artifact zips are deployed here.  Default format is 7z with highest compression.
 export ARTIFACTS_ROOT="${TIG_ROOT}/artifacts"
-
 

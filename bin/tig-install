@@ -93,8 +93,8 @@ if [ "$PNAME" = "windows" ]; then
     >&2 echo "--Installing procexp--"
     procexp_url="https://download.sysinternals.com/files/ProcessExplorer.zip"
     procexp_path="${LOCAL_BIN_ROOT}/procexp.exe"
-    mkdir -p $SRC_ZIP_ROOT
-    pushd $SRC_ZIP_ROOT
+    mkdir -p "$SRC_ZIP_ROOT"
+    pushd "$SRC_ZIP_ROOT"
       curl -L $procexp_url >ProcessExplorer.zip
       unzip -po ProcessExplorer.zip procexp.exe >$procexp_path
     popd
@@ -104,8 +104,8 @@ if [ "$PNAME" = "windows" ]; then
     >&2 echo "--Installing procmon--"
     procmon_url="https://download.sysinternals.com/files/ProcessMonitor.zip"
     procmon_path="${LOCAL_BIN_ROOT}/procmon.exe"
-    mkdir -p $SRC_ZIP_ROOT
-    pushd $SRC_ZIP_ROOT
+    mkdir -p "$SRC_BIN_ROOT"
+    pushd "$SRC_BIN_ROOT"
       curl -L $procmon_url >ProcessMonitor.zip
       unzip -po ProcessMonitor.zip Procmon.exe >$procmon_path
     popd
@@ -113,6 +113,7 @@ if [ "$PNAME" = "windows" ]; then
 
   if ! hash mongod 2>/dev/null; then
     >&2 echo "--Installing mongod--"
+    mkdirp "${SRC_BIN_ROOT}"
     pushd "${SRC_BIN_ROOT}"
       curl -L https://fastdl.mongodb.org/win32/mongodb-win32-x86_64-2008plus-ssl-3.0.3-signed.msi >mongodb_x86_64.msi
       cmd //c msiexec.exe //q //i mongodb-3.0.3-signed.msi INSTALLLOCATION="%USERPROFILE%\\local\\mongodb"
