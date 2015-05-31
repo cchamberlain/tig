@@ -3,7 +3,6 @@
   <component name="ChangeListManager">
     <list default="true" id="982fe109-f774-4e10-a562-3062d0f67e1a" name="Default" comment="">
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/README.md" afterPath="$PROJECT_DIR$/README.md" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/bin/tig-install" afterPath="$PROJECT_DIR$/bin/tig-install" />
     </list>
     <ignored path="tig.iws" />
     <ignored path=".idea/workspace.xml" />
@@ -29,8 +28,8 @@
           <file leaf-file-name="README.md" pinned="false" current-in-tab="true">
             <entry file="file://$PROJECT_DIR$/README.md">
               <provider selected="true" editor-type-id="text-editor">
-                <state vertical-scroll-proportion="0.2990556">
-                  <caret line="13" column="10" selection-start-line="13" selection-start-column="10" selection-end-line="14" selection-end-column="0" />
+                <state vertical-scroll-proportion="0.9601259">
+                  <caret line="139" column="0" selection-start-line="139" selection-start-column="0" selection-end-line="139" selection-end-column="0" />
                   <folding />
                 </state>
               </provider>
@@ -116,7 +115,7 @@
           <file leaf-file-name="tig-install" pinned="false" current-in-tab="true">
             <entry file="file://$PROJECT_DIR$/bin/tig-install">
               <provider selected="true" editor-type-id="text-editor">
-                <state vertical-scroll-proportion="0.09947644">
+                <state vertical-scroll-proportion="0.09674134">
                   <caret line="5" column="5" selection-start-line="5" selection-start-column="5" selection-end-line="5" selection-end-column="5" />
                   <folding />
                 </state>
@@ -504,7 +503,7 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/bin/tig-install">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.09947644">
+        <state vertical-scroll-proportion="0.09674134">
           <caret line="5" column="5" selection-start-line="5" selection-start-column="5" selection-end-line="5" selection-end-column="5" />
           <folding />
         </state>
@@ -512,8 +511,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/README.md">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.2990556">
-          <caret line="13" column="10" selection-start-line="13" selection-start-column="10" selection-end-line="14" selection-end-column="0" />
+        <state vertical-scroll-proportion="0.9601259">
+          <caret line="139" column="0" selection-start-line="139" selection-start-column="0" selection-end-line="139" selection-end-column="0" />
           <folding />
         </state>
       </provider>

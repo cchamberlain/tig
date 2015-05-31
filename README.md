@@ -54,17 +54,17 @@ commands
 tig has some dependencies.  They are very useful command line files and give tig a baseline for cross-platform scripting.  tig can also install optional portable applications that are extremely helpful in development.  If the application is already installed on your machine, it will be skipped.
 
 * hard dependencies
-** rimraf: small package for "rm -rf" in cross-platform context
-** mkdirp: like rimraf, but "mkdir -p"
-** google chrome: you should already have this but if you don't, it will be installed
+  * rimraf: small package for "rm -rf" in cross-platform context
+  * mkdirp: like rimraf, but "mkdir -p"
+  * google chrome: you should already have this but if you don't, it will be installed
 
 * optional
-** nodemon: run nodejs in a development fashion and reload as files change
-** forever: run nodejs in production and it will be auto restarted if something happens
-** gulp: nodejs build tool
-** ack: development tool for quickly scanning files for specific words or regex
-** ag: like ack, but faster
-** (Windows-only) procexp/procmon: Tools from SysInternals for analyzing Windows system processes
+  * nodemon: run nodejs in a development fashion and reload as files change
+  * forever: run nodejs in production and it will be auto restarted if something happens
+  * gulp: nodejs build tool
+  * ack: development tool for quickly scanning files for specific words or regex
+  * ag: like ack, but faster
+  * (Windows-only) procexp/procmon: Tools from SysInternals for analyzing Windows system processes
 
 
 ###tig login [-n] [-a] [-t] *username*|*organization*
@@ -101,7 +101,7 @@ Synchronizes everything you've tracked locally (or globally on other machines) t
 Gets the status of all repositories that have been synced to your local machine via the `tig mesh` command.
 
 * -v: gets recent version information
-** -c: specify how many of the recent versions you would like to display.
+  * -c: specify how many of the recent versions you would like to display.
 
 ###tig publish [-n] [-p] [-m] [-M] [-b *branch*] [-R *remote*] *repo-name* *"Commit and version message"*
 
