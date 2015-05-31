@@ -436,6 +436,14 @@ body {
   background: #fafafa url(../assets/images/body-bg.jpg) 0 0 repeat;
 }
 
+a {
+    webkit-box-sizing:initial;
+    box-sizing:content-box !important;
+    font-size:15px !important;
+    line-height:1.5 !important;
+}
+
+
 p {
   margin-top: 0;
 }
