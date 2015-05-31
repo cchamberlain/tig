@@ -1,6 +1,6 @@
 {
   "name": "tig",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "An abstraction layer to git.",
   "main": "index.js",
   "directories": {
@@ -20,5 +20,6 @@
   "bugs": {
     "url": "https://github.com/cchamberlain/tig/issues"
   },
-  "homepage": "https://github.com/cchamberlain/tig"
+  "homepage": "https://github.com/cchamberlain/tig",
+  "scripts": {}
 }
