@@ -2,8 +2,9 @@
 #
 # This script installs required applications
 
-. $HOME/.tixrc
+. $HOME/.tigrc
 #7:20
+#8:45
 
 >&2 echo "--Installing Required Applications--"
 if ! hash rimraf 2>/dev/null; then
@@ -16,23 +17,87 @@ if ! hash mkdirp 2>/dev/null; then
   >&2 echo "--**short for 'mkdir -p' (make directory recursively and skip silently if directory exists)**--"
   npm install -g mkdirp >/dev/null
 fi
-if ! hash nodemon 2>/dev/null; then
-  >&2 echo "--Installing nodemon--"
-  >&2 echo "--**runs node.js and watches server-side files for updates to trigger process reload**--"
-  npm install -g nodemon >/dev/null
-fi
-if ! hash forever 2>/dev/null; then
-  >&2 echo "--Installing forever--"
-  >&2 echo "--**runs node.js in a production setting, ensuring the process never goes down**--"
-  npm install -g forever >/dev/null
-fi
-if ! hash gulp 2>/dev/null; then
-  >&2 echo "--Installing gulp--"
-  npm install -g gulp >/dev/null
+if ! hash jq 2>/dev/null; then
+  >&2 echo "--Installing jq--"
+  >&2 echo "--**makes working with json on the command line easier**--"
+  if [ "$PNAME" = "windows" ]; then
+    curl http://stedolan.github.io/jq/download/win64/jq.exe >"${LOCAL_BIN_ROOT}/jq.exe"
+  elif ! hash brew 2>/dev/null; then
+    brew install jq
+  else
+    curl http://stedolan.github.io/jq/download/linux64/jq >"${LOCAL_BIN_ROOT}/jq"
+  fi
 fi
 if ! hash chrome 2>/dev/null; then
   >&2 echo "--Installing chrome--"
   if [ "$PNAME" = "windows" ]; then
     choco install google-chrome-x64
+  fi
+fi
+
+
+
+#TODO: Put -o flag here
+echo "--Installing optional packages--"
+
+if ! hash ack 2>/dev/null; then
+  ### ack: Fast file searching
+  echo "Installing ack..."
+  curl http://beyondgrep.com/ack-2.14-single-file > "${LOCAL_BIN_ROOT}/ack"
+  echo "ack installed successfully."
+fi
+
+if ! hash nodemon 2>/dev/null; then
+  >&2 echo "--Installing nodemon--"
+  >&2 echo "--**runs node.js and watches server-side files for updates to trigger process reload**--"
+  npm install -g nodemon >/dev/null
+fi
+
+if ! hash forever 2>/dev/null; then
+  >&2 echo "--Installing forever--"
+  >&2 echo "--**runs node.js in a production setting, ensuring the process never goes down**--"
+  npm install -g forever >/dev/null
+fi
+
+if ! hash gulp 2>/dev/null; then
+  >&2 echo "--Installing gulp--"
+  npm install -g gulp >/dev/null
+fi
+
+if ! hash ag 2>/dev/null; then
+  >&2 echo "--Installing ag (the silver searcher)--"
+  if hash brew 2>/dev/null; then
+    brew install the_silver_searcher
+  elif hash pacman 2>/dev/null; then
+    pacman -S the_silver_searcher
+  elif hash choco 2>/dev/null; then
+    choco install ag --yes --force &>/dev/null
+  fi
+fi
+
+
+if [ "$PNAME" = "windows" ]; then
+  ### sysinternals: process explorer
+  ### Good for looking at windows processes, file locking, etc.
+  if ! hash procexp 2>/dev/null; then
+    >&2 echo "--Installing procexp--"
+    procexp_url="https://download.sysinternals.com/files/ProcessExplorer.zip"
+    procexp_path="${LOCAL_BIN_ROOT}/procexp.exe"
+    mkdir -p $SRC_ZIP_ROOT
+    pushd $SRC_ZIP_ROOT
+      curl -L $procexp_url >ProcessExplorer.zip
+      unzip -po ProcessExplorer.zip procexp.exe >$procexp_path
+    popd
+  fi
+
+  if ! hash procmon 2>/dev/null; then
+    >&2 echo "--Installing procmon--"
+    procmon_url="https://download.sysinternals.com/files/ProcessMonitor.zip"
+    procmon_path="${LOCAL_BIN_ROOT}/procmon.exe"
+    mkdir -p $SRC_ZIP_ROOT
+    pushd $SRC_ZIP_ROOT
+      curl -L $procmon_url >ProcessMonitor.zip
+      unzip -po ProcessMonitor.zip Procmon.exe >$procmon_path
+    popd
   fi
 fi
