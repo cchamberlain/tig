@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset='utf-8'>
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <link href='https://fonts.googleapis.com/css?family=Architects+Daughter' rel='stylesheet' type='text/css'>
+    <link rel="stylesheet" type="text/css" href="stylesheets/stylesheet.css" media="screen">
+    <link rel="stylesheet" type="text/css" href="stylesheets/github-light.css" media="screen">
+    <link rel="stylesheet" type="text/css" href="stylesheets/print.css" media="print">
+
+    <!--[if lt IE 9]>
+    <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+
+    <title>tig by cchamberlain</title>
+  </head>
+
+  <body>
+    <header>
+      <div class="inner">
+        <h1>tig</h1>
+        <h2>An abstraction layer to git</h2>
+        <a href="https://github.com/cchamberlain/tig" class="button"><small>View project on</small> GitHub</a>
+      </div>
+    </header>
+
+    <div id="content-wrapper">
+      <div class="inner clearfix">
+        <section id="main-content">
+          <h1>
+<a id="tig-wip" class="anchor" href="#tig-wip" aria-hidden="true"><span class="octicon octicon-link"></span></a>tig (WIP)</h1>
+
+<p>A CLI abstraction layer to git with strong integration to dev-ops platforms.</p>
+
+<div class="highlight highlight-sh"><pre>npm install -g tig</pre></div>
+
+<p><em>Disclaimer: tig is a WIP.  Much of the tig functionality has been prototyped to varying levels, but it is still being very actively developed and not everything in this document is "done".  If you are interested in contributing to the goals of the platform, please shoot me an email at <a href="mailto:cole.chamberlain@gmail.com">cole.chamberlain@gmail.com</a>.</em></p>
+
+<h2>
+<a id="background" class="anchor" href="#background" aria-hidden="true"><span class="octicon octicon-link"></span></a>background</h2>
+
+<p>git has changed the way software development works.  Developers use many libraries, often on multiple computers and with all this code getting synced around, things can get messy.</p>
+
+<p>tig is an extension to git and other web platforms that allows a developer to sync code to their local computers in a controlled fashion.  With tig, you, the developer, define what libraries you are interested in with a "track" function.  Once a library is tracked it can be orchestrated alongside your other git libraries via tig commands.</p>
+
+<p>npm has shown how smart REST APIs can change the way we work with, package, and deploy code.  The days of tracking your local settings for each of your dev tools in rc files are dying.  tig has this covered with the ability to sync all of your "dotfiles".  This includes settings for git, GitHub, npm, AWS, and travis-ci and you can add your own.</p>
+
+<h2>
+<a id="roadmap" class="anchor" href="#roadmap" aria-hidden="true"><span class="octicon octicon-link"></span></a>roadmap</h2>
+
+<p>tig attempts to make some smart assumptions to allow users to keep typing to a minimum.  The tig APIs use OAuth2 openid JWT bearer tokens to track who you are.  tig assumes that you are using GitHub for your source code hosting and npmjs.com for your npm hosting.  Once authorized with the tig CLI you will be able to access tig APIs in reference to your account without referencing your username in the URL.  As well when working in the command line, if you track a new repo, you will not need to reference the full GitHub url as you would in a normal clone.</p>
+
+<p>URLs are case-insensitive.  Most operating systems are not.  Therefore, tig normalizes all data to lowercase unless otherwise expressed.  All tig commands and URLs are lowercase with hyphen word separators.</p>
+
+<h3>
+<a id="tiglink" class="anchor" href="#tiglink" aria-hidden="true"><span class="octicon octicon-link"></span></a>tig.link</h3>
+
+<ul>
+<li><p>User API: <a href="https://tig.link%5B/*username*%7C*organization*%5D">https://tig.link[/*username*|*organization*]</a></p></li>
+<li><p>Repository API: <a href="https://tig.link%5B/*username*%7C*organization*%5D/*repo-name*">https://tig.link[/*username*|*organization*]/*repo-name*</a></p></li>
+</ul>
+
+<h3>
+<a id="tigsh" class="anchor" href="#tigsh" aria-hidden="true"><span class="octicon octicon-link"></span></a>tig.sh</h3>
+
+<ul>
+<li><p>Shell API: <a href="https://tig.sh%5B/*username*%7C*organization*%5D/*script-name*">https://tig.sh[/*username*|*organization*]/*script-name*</a>
+** Store your scripts for setup and automation of various platforms and allow ease of execution.
+** Operate as standalone or integrate with Gist / AWS S3</p></li>
+<li><p>Dot API: <a href="https://tig.sh%5B/*username*%7C*organization*%5D/./*dot-file-name*">https://tig.sh[/*username*|*organization*]/./*dot-file-name*</a>
+** Store your dot files privately.  If you feel like it, make them public and share with others.</p></li>
+</ul>
+
+<hr>
+
+<h2>
+<a id="commands" class="anchor" href="#commands" aria-hidden="true"><span class="octicon octicon-link"></span></a>commands</h2>
+
+<h3>
+<a id="tig-install--o" class="anchor" href="#tig-install--o" aria-hidden="true"><span class="octicon octicon-link"></span></a>tig install [-o]</h3>
+
+<p>tig has some dependencies.  They are very useful command line files and give tig a baseline for cross-platform scripting.  tig can also install optional portable applications that are extremely helpful in development.  If the application is already installed on your machine, it will be skipped.</p>
+
+<ul>
+<li><p>hard dependencies
+** rimraf: small package for "rm -rf" in cross-platform context
+** mkdirp: like rimraf, but "mkdir -p"
+** google chrome: you should already have this but if you don't, it will be installed</p></li>
+<li><p>optional
+** nodemon: run nodejs in a development fashion and reload as files change
+** forever: run nodejs in production and it will be auto restarted if something happens
+** gulp: nodejs build tool
+** ack: development tool for quickly scanning files for specific words or regex
+** ag: like ack, but faster
+** (Windows-only) procexp/procmon: Tools from SysInternals for analyzing Windows system processes</p></li>
+</ul>
+
+<h3>
+<a id="tig-login--n--a--t-usernameorganization" class="anchor" href="#tig-login--n--a--t-usernameorganization" aria-hidden="true"><span class="octicon octicon-link"></span></a>tig login [-n] [-a] [-t] <em>username</em>|<em>organization</em>
+</h3>
+
+<p>tig is integrated with GitHub and your GitHub username / password has already been reserved for you on the tig network.  Support for other providers is in progress.  If you belong to multiple organization accounts, tig can handle that too.</p>
+
+<p>tig is built to handle one or more npm, aws, and travis-ci accounts that you may use.</p>
+
+<h3>
+<a id="tig-config" class="anchor" href="#tig-config" aria-hidden="true"><span class="octicon octicon-link"></span></a>tig config</h3>
+
+<p>configure your tig settings here.</p>
+
+<h3>
+<a id="tig-track--g--s--d-usernameorganizationreposcriptdot-file" class="anchor" href="#tig-track--g--s--d-usernameorganizationreposcriptdot-file" aria-hidden="true"><span class="octicon octicon-link"></span></a>tig track [-g] [-s] [-d] [[<em>username</em>|<em>organization</em>/]<em>repo</em>|<em>script</em>|<em>dot-file</em>]</h3>
+
+<p>Adds something to the tig index that will be tracked on your tig account.  By default, tig assumes you want to track a GitHub repo but flags can be specified to track scripts and dot files.</p>
+
+<ul>
+<li>-g: the object should be meshed to all computers that you authenticate with via tig (defaults to just the computer you are on)</li>
+<li>-s: the object being tracked is a script file</li>
+<li>-d: the object being tracked is a dot file</li>
+</ul>
+
+<h3>
+<a id="tig-mesh--s--r-repo--v-version" class="anchor" href="#tig-mesh--s--r-repo--v-version" aria-hidden="true"><span class="octicon octicon-link"></span></a>tig mesh [-s] [-r <em>repo</em> [-v <em>version</em>]]</h3>
+
+<p>Synchronizes everything you've tracked locally (or globally on other machines) to your machine.  By default, repositories will be synced down from the master branch.  This functionality can be overridden in your tig configuration settings.</p>
+
+<ul>
+<li>-s: mesh the target repo(s) to your sync folder instead of src folder</li>
+<li>-r: mesh a specific repository and optional version (annotated or hash)</li>
+</ul>
+
+<h3>
+<a id="tig-status--v--c-count-repo" class="anchor" href="#tig-status--v--c-count-repo" aria-hidden="true"><span class="octicon octicon-link"></span></a>tig status [-v [-c <em>count</em>]] [<em>repo</em>]</h3>
+
+<p>Gets the status of all repositories that have been synced to your local machine via the <code>tig mesh</code> command.</p>
+
+<ul>
+<li>-v: gets recent version information
+** -c: specify how many of the recent versions you would like to display.</li>
+</ul>
+
+<h3>
+<a id="tig-publish--n--p--m--m--b-branch--r-remote-repo-name-commit-and-version-message" class="anchor" href="#tig-publish--n--p--m--m--b-branch--r-remote-repo-name-commit-and-version-message" aria-hidden="true"><span class="octicon octicon-link"></span></a>tig publish [-n] [-p] [-m] [-M] [-b <em>branch</em>] [-R <em>remote</em>] <em>repo-name</em> <em>"Commit and version message"</em>
+</h3>
+
+<p>Git adds, commits, and pushes a repo to origin.  Flags can be provided to do a semver style annotated tag as well as publish the new package on npm.  You may also override the branch name and remote name that are being pushed to.</p>
+
+<ul>
+<li>-n: Publish on npm</li>
+<li>-p: Do a semver patch version bump</li>
+<li>-m: Do a semver minor version bump</li>
+<li>-M: Do a semver major version bump</li>
+<li>-b: Override the branch you want to push to on the remote</li>
+<li>-R: Push to a non-origin remote</li>
+</ul>
+
+<h3>
+<a id="tig-build--v-version-repo" class="anchor" href="#tig-build--v-version-repo" aria-hidden="true"><span class="octicon octicon-link"></span></a>tig build [-v <em>version</em>] [<em>repo</em>]</h3>
+
+<p>Builds your code locally using the sync and build folders</p>
+
+<ul>
+<li>-v: build a specific version of the repository</li>
+</ul>
+
+<h3>
+<a id="tig-run--s-reposcript" class="anchor" href="#tig-run--s-reposcript" aria-hidden="true"><span class="octicon octicon-link"></span></a>tig run [-s] [<em>repo</em>|<em>script</em>]</h3>
+
+<p>Build and execute one of your tracked repositories or scripts on the local machine.</p>
+
+<ul>
+<li>-s: The object to execute is a tracked script</li>
+</ul>
+
+<h3>
+<a id="tig-deploy--a--f--u-repo" class="anchor" href="#tig-deploy--a--f--u-repo" aria-hidden="true"><span class="octicon octicon-link"></span></a>tig deploy [-a] [-f] [-u] [<em>repo</em>]</h3>
+
+<p>Builds code artifacts locally and optionally pushes them to FTP, UNC, or cloud service.</p>
+
+<ul>
+<li>-a: AWS deployment</li>
+<li>-f: FTP deployment</li>
+<li>-u: UNC deployment</li>
+</ul>
+        </section>
+
+        <aside id="sidebar">
+          <a href="https://github.com/cchamberlain/tig/zipball/master" class="button">
+            <small>Download</small>
+            .zip file
+          </a>
+          <a href="https://github.com/cchamberlain/tig/tarball/master" class="button">
+            <small>Download</small>
+            .tar.gz file
+          </a>
+
+          <p class="repo-owner"><a href="https://github.com/cchamberlain/tig"></a> is maintained by <a href="https://github.com/cchamberlain">cchamberlain</a>.</p>
+
+          <p>This page was generated by <a href="https://pages.github.com">GitHub Pages</a> using the Architect theme by <a href="https://twitter.com/jasonlong">Jason Long</a>.</p>
+        </aside>
+      </div>
+    </div>
+
+  
+  </body>
+</html>
