@@ -2,7 +2,16 @@
 #
 # This script installs required applications
 
-cp $HOME/src/tig/lib/tigrc $HOME/.tigrc
+if [ ! -f "$CONFIG_PATH" ] ; then
+  src_root=$HOME/src
+  if [ ! -d "$src_root/cchamberlain/tig" ] ; then
+    mkdir -p "$src_root/cchamberlain"
+    pushd "$src_root/cchamberlain"
+      git clone https://github.com/cchamberlain/tig
+    popd
+  fi
+  cp "$src_root/cchamberlain/tig/lib/tigrc" "$HOME/.tigrc"
+fi
 
 . $HOME/.tigrc
 
