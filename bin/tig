@@ -11,6 +11,7 @@ if [ ! -f "$CONFIG_PATH" ] ; then
   tig-install -ir
   . $CONFIG_PATH
 fi
+. $CONFIG_PATH
 
 usage_short="${CYAN}Usage: tig <command> <opts>${NC}"
 
