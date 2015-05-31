@@ -67,7 +67,7 @@ tig has some dependencies.  They are very useful command line files and give tig
 ** (Windows-only) procexp/procmon: Tools from SysInternals for analyzing Windows system processes
 
 
-###tig login [-n] [-a] [-t] *username*
+###tig login [-n] [-a] [-t] *username*|*organization*
 
 tig is integrated with GitHub and your GitHub username / password has already been reserved for you on the tig network.  Support for other providers is in progress.  If you belong to multiple organization accounts, tig can handle that too.
 
@@ -79,7 +79,7 @@ tig is built to handle one or more npm, aws, and travis-ci accounts that you may
 configure your tig settings here.
 
 
-###tig track [-g] [-s] [-d] [[username|organization/]repo|script|dot-file]
+###tig track [-g] [-s] [-d] [[*username*|*organization*/]*repo*|*script*|*dot-file*]
 
 Adds something to the tig index that will be tracked on your tig account.  By default, tig assumes you want to track a GitHub repo but flags can be specified to track scripts and dot files.
 
@@ -88,7 +88,7 @@ Adds something to the tig index that will be tracked on your tig account.  By de
 * -d: the object being tracked is a dot file
 
 
-###tig mesh [-s] [-r repo [-v version]]
+###tig mesh [-s] [-r *repo* [-v *version*]]
 
 Synchronizes everything you've tracked locally (or globally on other machines) to your machine.  By default, repositories will be synced down from the master branch.  This functionality can be overridden in your tig configuration settings.
 
@@ -96,12 +96,14 @@ Synchronizes everything you've tracked locally (or globally on other machines) t
 * -r: mesh a specific repository and optional version (annotated or hash)
 
 
-###tig status [repo] [-v]
+###tig status [-v [-c *count*]] [*repo*]
 
 Gets the status of all repositories that have been synced to your local machine via the `tig mesh` command.
 
+* -v: gets recent version information
+** -c: specify how many of the recent versions you would like to display.
 
-###tig publish [-n] [-p] [-m] [-M] [-b branch] [-R remote] repo-name "Commit and version message"
+###tig publish [-n] [-p] [-m] [-M] [-b *branch*] [-R *remote*] *repo-name* *"Commit and version message"*
 
 Git adds, commits, and pushes a repo to origin.  Flags can be provided to do a semver style annotated tag as well as publish the new package on npm.  You may also override the branch name and remote name that are being pushed to.
 
@@ -113,21 +115,21 @@ Git adds, commits, and pushes a repo to origin.  Flags can be provided to do a s
 * -R: Push to a non-origin remote
 
 
-###tig build [-v version] [repo]
+###tig build [-v *version*] [*repo*]
 
 Builds your code locally using the sync and build folders
 
 * -v: build a specific version of the repository
 
 
-###tig run [-s] [repo|script]
+###tig run [-s] [*repo*|*script*]
 
 Build and execute one of your tracked repositories or scripts on the local machine.
 
 * -s: The object to execute is a tracked script
 
 
-###tig deploy [-a] [-f] [-u] [repo]
+###tig deploy [-a] [-f] [-u] [*repo*]
 
 Builds code artifacts locally and optionally pushes them to FTP, UNC, or cloud service.
 
