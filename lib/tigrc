@@ -73,7 +73,8 @@ export WHITE='\033[1;37m'
 ### --URLs--
 ### Store any commonly used URLs here
 
-export GITHUB_URL_BASE="https://github.com"
+export TIG_URL_BASE="https://tig.link"
+export GIT_URL_BASE="https://github.com"
 
 ### --PATHS--
 ### All paths are absolute.
