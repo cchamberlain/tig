@@ -2,7 +2,8 @@
 #
 # Git adds, commits, npm version, npm publishes, and git pushes the specified module directory.
 
-. $HOME/.tigrc
+TIGRC_PATH="$HOME/.tigrc"
+. "$TIGRC_PATH"
 
 ### if no arguments, throw an error
 if [ $# -eq 0 ]; then

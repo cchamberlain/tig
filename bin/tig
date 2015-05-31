@@ -5,13 +5,13 @@
 set -e
 OPTIND=1
 
-CONFIG_PATH=$HOME/.tigrc
-if [ ! -f "$CONFIG_PATH" ] ; then
+TIGRC_PATH="$HOME/.tigrc"
+if [ ! -f "$TIGRC_PATH" ] ; then
   # Install required dependencies with init flag
   tig-install -ir
-  . $CONFIG_PATH
+  . "$TIGRC_PATH"
 fi
-. $CONFIG_PATH
+. "$TIGRC_PATH"
 
 usage_short="${CYAN}Usage: tig <command> <opts>${NC}"
 
