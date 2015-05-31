@@ -16,18 +16,18 @@ if [ $# -eq 1 ]; then
   exit 1
 fi
 
-module_dir=$1
+repo=$1
 commit_message=$2
 skip_npm=${3-false}
-module_path="$MODULE_ROOT/$module_dir"
+module_path="$SRC_ROOT/$repo"
 
 ### if module already cloned, throw an error
 if [ ! -d "$module_path" ]; then
-  >&2 "echo Module $module_dir does not exist at $module_path..."
+  >&2 "echo Module $repo does not exist at $module_path..."
   exit 1
 fi
 
->&2 echo "publishing $module_dir at $module_path..."
+>&2 echo "publishing $repo at $module_path..."
 
 pushd $module_path >/dev/null
 
@@ -41,4 +41,4 @@ git push --follow-tags #| grep -qi "fatal" && >&2 echo "An error occurred while 
 
 popd >/dev/null
 
->&2 echo "NPM published $module_dir and changes pushed successfully!"
+>&2 echo "NPM published $repo and changes pushed successfully!"
