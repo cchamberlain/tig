@@ -3,8 +3,7 @@
 # This script installs required applications
 
 . $HOME/.tigrc
-#7:20
-#8:45
+
 
 >&2 echo "--Installing Required Applications--"
 if ! hash rimraf 2>/dev/null; then
@@ -98,6 +97,15 @@ if [ "$PNAME" = "windows" ]; then
     pushd $SRC_ZIP_ROOT
       curl -L $procmon_url >ProcessMonitor.zip
       unzip -po ProcessMonitor.zip Procmon.exe >$procmon_path
+    popd
+  fi
+
+  if ! hash mongod 2>/dev/null; then
+    >&2 echo "--Installing mongod--"
+    pushd "${SRC_BIN_ROOT}"
+      curl -L https://fastdl.mongodb.org/win32/mongodb-win32-x86_64-2008plus-ssl-3.0.3-signed.msi >mongodb_x86_64.msi
+      cmd //c msiexec.exe //q //i mongodb-3.0.3-signed.msi INSTALLLOCATION="%USERPROFILE%\\local\\mongodb"
+      mkdirp "${TIG_ROOT}/data/db"
     popd
   fi
 fi
