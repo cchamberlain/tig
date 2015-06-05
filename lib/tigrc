@@ -75,6 +75,7 @@ export WHITE='\033[1;37m'
 
 export TIG_URL_BASE="https://tig.link"
 export GIT_URL_BASE="https://github.com"
+export GIT_TIG_LINK_URL="${GIT_URL_BASE}/cchamberlain/tig-link"
 
 ### --PATHS--
 ### All paths are absolute.

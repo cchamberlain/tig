@@ -4,7 +4,7 @@
 
 TIGRC_PATH="$HOME/.tigrc"
 if [ ! -f "$TIGRC_PATH" ] ; then
-  src_root=$HOME/src
+  src_root="$HOME/src"
   if [ ! -d "$src_root/cchamberlain/tig" ] ; then
     mkdir -p "$src_root/cchamberlain"
     pushd "$src_root/cchamberlain"
