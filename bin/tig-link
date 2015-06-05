@@ -15,7 +15,7 @@ start=false
 stop=false
 restart=false
 
-usage_short="${CYAN}Usage: tig-link [-i] [-c] [-u] [-f] [-d] [-s] [-z] [-r]"
+usage_short="${CYAN}Usage: tig-link [-i] [-c] [-u] [-f] [-d] [-s] [-z] [-r]${NC}"
 usage_long="$usage_short\n-i: Installs tig-link server."
 usage_long="$usage_long\n-c: Clones tig-link server (overwrites)."
 usage_long="$usage_long\n-u: Updates tig-link server."
