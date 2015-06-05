@@ -5,16 +5,15 @@
 
 set -e
 
-OPTIND=1
-
-renew=false
-
 usage_short="${CYAN}Usage: tig-login [-r]"
 usage_long="$usage_short\n-r: Get a fresh token from GitHub."
 
 usage_short="$usage_short\nUse -h to get supported command information."
 
+renew=false
+
 options=":rh"
+OPTIND=1
 while getopts "$options" opt ; do
     case "$opt" in
     r ) # Gets latest annotated revision
@@ -39,8 +38,8 @@ while getopts "$options" opt ; do
       >&2 echo -e "$usage_short"
       exit 1
     esac
-    shift $((OPTIND-1))
 done
+shift $((OPTIND-1))
 
 . $HOME/.tixrc
 readonly GITHUB_TOKEN_KEY="GITHUB_TOKEN"
