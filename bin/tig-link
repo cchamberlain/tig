@@ -7,7 +7,7 @@ set -e
 OPTIND=1
 
 install=false
-configure=false
+clone=false
 update=false
 reinstall=false
 delete=false
@@ -15,34 +15,34 @@ start=false
 stop=false
 restart=false
 
-usage_short="${CYAN}Usage: tig-link [-I] [-C] [-U] [-R] [-D] [-s] [-z] [-R]"
-usage_long="$usage_short\n-I: Installs tig-link server."
-usage_long="$usage_long\n-C: Configures tig-link server (overwrites)."
-usage_long="$usage_long\n-U: Updates tig-link server."
-usage_long="$usage_long\n-R: Reinstalls tig-link server."
-usage_long="$usage_long\n-D: Deletes tig-link server."
+usage_short="${CYAN}Usage: tig-link [-i] [-c] [-u] [-f] [-d] [-s] [-z] [-r]"
+usage_long="$usage_short\n-i: Installs tig-link server."
+usage_long="$usage_long\n-c: Clones tig-link server (overwrites)."
+usage_long="$usage_long\n-u: Updates tig-link server."
+usage_long="$usage_long\n-f: Full reinstall tig-link server."
+usage_long="$usage_long\n-d: Deletes tig-link server."
 usage_long="$usage_long\n-s: starts tig-link server."
 usage_long="$usage_long\n-z: stops tig-link server."
 usage_long="$usage_long\n-r: restarts tig-link server."
 
 usage_short="$usage_short\nUse -h to get supported command information."
 
-options=":IURDsrzh"
+options=":icufdszrh"
 while getopts "$options" opt ; do
     case "$opt" in
-    I )
+    i )
       install=true
       ;;
-    C )
-      configure=true
+    c )
+      clone=true
       ;;
-    U )
+    u )
       update=true
       ;;
-    R )
+    f )
       reinstall=true
       ;;
-    D )
+    d )
       delete=true
       ;;
     s )
@@ -77,10 +77,29 @@ while getopts "$options" opt ; do
 done
 
 
+src_root="$SRC_ROOT/tig-link"
 app_root="$LOCAL_ROOT/tig-link"
 app_lib_root="$app_root/lib"
 app_config_path="$app_root/.tig.json"
 app_config_default_path="$app_lib_root/tig.json"
+
+if [ "$clone" = true ] ; then
+  if [ -d "$src_root" ] ; then
+    >&2 echo -e "${RED}--tig-link is already cloned--${NC}"
+  else
+    mkdirp "$SRC_ROOT"
+    pushd "$SRC_ROOT" >/dev/null
+      >&2 echo -e "--Cloning tig-link to $src_root--"
+      git clone "$GIT_TIG_LINK_URL" &>/dev/null
+      pushd tig-link >/dev/null
+        >&2 echo -e "--npm installing...--"
+        npm install &>/dev/null
+        >&2 echo -e "${GREEN}--npm install finished--${GREEN}"
+      popd >/dev/null
+    popd >/dev/null
+    >&2 echo -e "${GREEN}--tig-link cloned successfully--${NC}"
+  fi
+fi
 
 if [ "$install" = true ] ; then
   if ! hash mkdirp 2>/dev/null ; then
