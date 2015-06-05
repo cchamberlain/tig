@@ -42,7 +42,21 @@ while getopts "$options" opt ; do
     shift $((OPTIND-1))
 done
 
-. "$HOME/.tixrc"
+TIGRC_PATH="$HOME/.tigrc"
+if [ ! -f "$TIGRC_PATH" ] ; then
+  src_root="$HOME/src"
+  if [ ! -d "$src_root/cchamberlain/tig" ] ; then
+    mkdir -p "$src_root/cchamberlain"
+    pushd "$src_root/cchamberlain"
+      git clone https://github.com/cchamberlain/tig
+    popd
+  fi
+  cp "$src_root/cchamberlain/tig/lib/tigrc" "$TIGRC_PATH"
+fi
+
+. "$TIGRC_PATH"
+
+
 readonly GITHUB_TOKEN_KEY="GITHUB_TOKEN"
 
 ### --GIT CONFIG--
@@ -80,9 +94,9 @@ if ! grep -q push.default <<< "$git_config" ; then
 fi
 
 ### If config file does not exist or does not contain the github token
-if [ "$renew" = true ] || [ ! -e "$CONFIG_PATH" ] || ! grep -q $GITHUB_TOKEN_KEY $CONFIG_PATH; then
+if [ "$renew" = true ] || [ ! -e "$TIGRC_PATH" ] || ! grep -q $GITHUB_TOKEN_KEY $TIGRC_PATH; then
     >&2 echo "--GitHub credentials are required to interact with the GitHub api--"
-    >&2 echo "--Your basic credentials will be exchanged for a token and persisted to ${CONFIG_PATH}--"
+    >&2 echo "--Your basic credentials will be exchanged for a token and persisted to ${TIGRC_PATH}--"
 
     oauth_note="OAuth token for "$(hostname)/$(id -un)"."
     oauth_data="{\"scopes\":[\"repo\",\"write:public_key\"], \"note\":\"$oauth_note\"}"
@@ -109,7 +123,7 @@ if [ "$renew" = true ] || [ ! -e "$CONFIG_PATH" ] || ! grep -q $GITHUB_TOKEN_KEY
           *"token"*) ### Token Found!
             oauth_credentials_ok=true
             oauth_token_received=true
-            >&2 echo "--Token received, persisting to ${CONFIG_PATH}--"
+            >&2 echo "--Token received, persisting to ${TIGRC_PATH}--"
             ;;
           *already_exists*) ### Token already exists but was not found on this machine...
             oauth_credentials_ok=true
@@ -134,11 +148,11 @@ if [ "$renew" = true ] || [ ! -e "$CONFIG_PATH" ] || ! grep -q $GITHUB_TOKEN_KEY
         do
          if [ ${#token} -eq 40 ]; then
             ### Set the github token in the config
-            echo -e "\r\nexport $GITHUB_TOKEN_KEY=\"$token\"\r\n" >>$CONFIG_PATH
+            echo -e "\r\nexport $GITHUB_TOKEN_KEY=\"$token\"\r\n" >>$TIGRC_PATH
             GITHUB_AUTH_HEADER="Authorization: token $token"
-            echo -e "\r\nexport GITHUB_AUTH_HEADER=\"$GITHUB_AUTH_HEADER\"\r\n" >>$CONFIG_PATH
+            echo -e "\r\nexport GITHUB_AUTH_HEADER=\"$GITHUB_AUTH_HEADER\"\r\n" >>$TIGRC_PATH
             ### Replace github url with token github url in config
-            >&2 sed -bi "s/https:\/\/github.com/https:\/\/$token@github.com/" $CONFIG_PATH
+            >&2 sed -bi "s/https:\/\/github.com/https:\/\/$token@github.com/" $TIGRC_PATH
 
             if [ ! -d "$HOME/.ssh" ]; then
               >&2 echo "--No ssh key found for GitHub, adding now--"
@@ -163,7 +177,7 @@ if [ "$renew" = true ] || [ ! -e "$CONFIG_PATH" ] || ! grep -q $GITHUB_TOKEN_KEY
 fi
 
 ### Source the variable from the config file
-. "$CONFIG_PATH"
+. "$TIGRC_PATH"
 
 if [ -n "$GITHUB_TOKEN" ]; then
     ### Update all github tokens
