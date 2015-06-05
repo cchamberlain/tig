@@ -5,14 +5,28 @@
 
 set -e
 
+TIGRC_PATH="$HOME/.tigrc"
+if [ ! -f "$TIGRC_PATH" ] ; then
+  src_root="$HOME/src"
+  if [ ! -d "$src_root/cchamberlain/tig" ] ; then
+    mkdir -p "$src_root/cchamberlain"
+    pushd "$src_root/cchamberlain"
+      git clone https://github.com/cchamberlain/tig
+    popd
+  fi
+  cp "$src_root/cchamberlain/tig/lib/tigrc" "$TIGRC_PATH"
+fi
+. "$TIGRC_PATH"
+
+renew=false
+
 usage_short="${CYAN}Usage: tig-login [-r]"
 usage_long="$usage_short\n-r: Get a fresh token from GitHub."
 
 usage_short="$usage_short\nUse -h to get supported command information."
 
-renew=false
-
 options=":rh"
+shopt -u nocasematch
 OPTIND=1
 while getopts "$options" opt ; do
     case "$opt" in
@@ -40,20 +54,6 @@ while getopts "$options" opt ; do
     esac
 done
 shift $((OPTIND-1))
-
-TIGRC_PATH="$HOME/.tigrc"
-if [ ! -f "$TIGRC_PATH" ] ; then
-  src_root="$HOME/src"
-  if [ ! -d "$src_root/cchamberlain/tig" ] ; then
-    mkdir -p "$src_root/cchamberlain"
-    pushd "$src_root/cchamberlain"
-      git clone https://github.com/cchamberlain/tig
-    popd
-  fi
-  cp "$src_root/cchamberlain/tig/lib/tigrc" "$TIGRC_PATH"
-fi
-
-. "$TIGRC_PATH"
 
 readonly GITHUB_TOKEN_KEY="GITHUB_TOKEN"
 

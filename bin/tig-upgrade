@@ -4,20 +4,22 @@
 # Upgrades tig to latest npm deployed version
 
 set -e
+. "$HOME/.tigrc"
 
-usage_short="${CYAN}Usage: tig-login [-r]"
-usage_long="$usage_short\n-r: Get a fresh token from GitHub."
+flag=false
 
-usage_short="$usage_short\nUse -h to get supported command information."
+usage_short="${CYAN}Usage: tig-***** [-f]"
+usage_long="$usage_short\n-f: ***Flag Description Here (default: $flag).${NC}"
 
-renew=false
+usage_short="$usage_short\nUse -h to get supported command information.${NC}"
 
-options=":rh"
+options=":fh"
+shopt -u nocasematch
 OPTIND=1
 while getopts "$options" opt ; do
     case "$opt" in
-    r ) # Gets latest annotated revision
-      renew=true
+    f )
+      flag=true
       ;;
     h )
       >&2 echo -e "$usage_long" && exit 1
@@ -40,135 +42,3 @@ while getopts "$options" opt ; do
     esac
 done
 shift $((OPTIND-1))
-
-. $HOME/.tixrc
-readonly GITHUB_TOKEN_KEY="GITHUB_TOKEN"
-
-### --GIT CONFIG--
-### Setup global git configuration if not set.
-
-GIT_CONFIG_PATH="$HOME/.gitconfig"
-if [ ! -f "$GIT_CONFIG_PATH" ]; then
-  >&2 touch "$GIT_CONFIG_PATH"
-  >&2 clear
-  >&2 echo "--First time git setup--"
-  >&2 echo "--You will be prompted for information regarding your global git configuration--"
-fi
-
-git_config=$(git config --global -l)
-
-if ! grep -q user.name <<< "$git_config" ; then
-  >&2 echo "--No user name set in git global configuration--"
-  >&2 echo -n "Your full name (e.g. 'John Doe'): "
-  read git_user
-  >&2 git config --global user.name "$git_user"
-fi
-if ! grep -q user.email <<< "$git_config" ; then
-  >&2 echo "--No user email set in git global configuration--"
-  >&2 echo -n "Your email address: "
-  read git_email
-  >&2 git config --global user.email $git_email
-fi
-if ! grep -q credential.helper <<< "$git_config" ; then
-  >&2 echo "--Git credential helper not configured, configuring now--"
-  >&2 git config --global credential.helper wincred
-fi
-if ! grep -q push.default <<< "$git_config" ; then
-  >&2 echo "--Git push default not set, configuring to simple--"
-  >&2 git config --global push.default simple
-fi
-
-### If config file does not exist or does not contain the github token
-if [ "$renew" = true ] || [ ! -e "$CONFIG_PATH" ] || ! grep -q $GITHUB_TOKEN_KEY $CONFIG_PATH; then
-    >&2 echo "--GitHub credentials are required to interact with the GitHub api--"
-    >&2 echo "--Your basic credentials will be exchanged for a token and persisted to ${CONFIG_PATH}--"
-
-    oauth_note="OAuth token for "$(hostname)/$(id -un)"."
-    oauth_data="{\"scopes\":[\"repo\",\"write:public_key\"], \"note\":\"$oauth_note\"}"
-    oauth_credentials=""
-    oauth_credentials_ok=false
-    oauth_token_received=false
-    oauth_response=""
-
-    while [ "$oauth_token_received" = false ]; do
-      if [ "$oauth_credentials_ok" = false ]; then
-        ### Read users GitHub credentials
-        >&2 echo -n "GitHub Username: "
-        read username
-        >&2 echo -n "GitHub Password: "
-        read -s password
-        oauth_credentials="$username:$password"
-        >&2 echo -e "\r\n"
-      fi
-
-      ### Call GitHub API to get a token.
-      oauth_response=$(curl -s -u $oauth_credentials -X POST -d "$oauth_data" https://api.github.com/authorizations) 2>&1
-
-      case "$oauth_response" in
-          *"token"*) ### Token Found!
-            oauth_credentials_ok=true
-            oauth_token_received=true
-            >&2 echo "--Token received, persisting to ${CONFIG_PATH}--"
-            ;;
-          *already_exists*) ### Token already exists but was not found on this machine...
-            oauth_credentials_ok=true
-            >&2 echo "--Token has already been granted for you but was lost.  Login to window at the right, revoke token named \"$oauth_note\", and close the window--"
-            chrome_path="unknown"
-            token_url="https://github.com/settings/tokens"
-            >&2 chrome-box "$token_url"
-            ;;
-          *Bad\ credentials*) ### Wrong username/password provided
-            >&2 echo "--The username / password combination you provided was incorrect.  Try again--"
-            ;;
-          *) ### Unknown Issue
-            >&2 echo "--An unknown error occurred.  Log file saved to ${LOG_PATH}--"
-            echo "--Unknown issue authenticating with GitHub API - response: $oauth_response--" >> $LOG_PATH
-            exit 1
-            ;;
-      esac
-    done
-
-    ### Parse out the token from the json response and stick it in the token file
-    echo "$oauth_response" | tr ',' '\n' | tr -d '" {}' | grep ^token: | sed s/token:// | while read token
-        do
-         if [ ${#token} -eq 40 ]; then
-            ### Set the github token in the config
-            echo -e "\r\nexport $GITHUB_TOKEN_KEY=\"$token\"\r\n" >>$CONFIG_PATH
-            GITHUB_AUTH_HEADER="Authorization: token $token"
-            echo -e "\r\nexport GITHUB_AUTH_HEADER=\"$GITHUB_AUTH_HEADER\"\r\n" >>$CONFIG_PATH
-            ### Replace github url with token github url in config
-            >&2 sed -bi "s/https:\/\/github.com/https:\/\/$token@github.com/" $CONFIG_PATH
-
-            if [ ! -d "$HOME/.ssh" ]; then
-              >&2 echo "--No ssh key found for GitHub, adding now--"
-              email=$(git config --get user.email 2>&1)
-              >&2 mkdir -p "$HOME/.ssh"
-              echo -e "\n\n\n" | ssh-keygen -t rsa -b 4096 -N "" -C "$email" >&2
-              ssh_key=$(cat $HOME/.ssh/id_rsa.pub)
-              ssh_data="{\"title\": \"$email\",\"key\": \"$ssh_key\"}"
-
-              >&2 curl -X POST -H "Content-type: application/json" -H "$GITHUB_AUTH_HEADER" -d "$ssh_data" "https://api.github.com/user/keys"
-              >&2 echo "--SSH key added successfully--"
-              >&2 echo "--Adding key to ssh agent--"
-              >&2 eval $(ssh-agent -s)
-              >&2 ssh-add $HOME/.ssh/id_rsa
-              >&2 ssh -oStrictHostKeyChecking=no -T git@github.com
-              >&2 echo "--Key added successfully--"
-            fi
-
-            update-github-tokens "$token"
-         fi
-        done
-fi
-
-### Source the variable from the config file
-. "$CONFIG_PATH"
-
-if [ -n "$GITHUB_TOKEN" ]; then
-    ### Update all github tokens
-    echo "$GITHUB_TOKEN" | tr -d '\n'
-    exit 0
-else
-    >&2 echo "--$GITHUB_TOKEN_KEY not found in the config file! Exiting...--"
-    exit 1
-fi

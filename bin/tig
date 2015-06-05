@@ -43,30 +43,4 @@ if [ "$command" = "-h" ] ; then
   exit 0
 fi
 
-#options=":h"
-
-### Command line flags
-#while getopts "$options" opt; do
-#    case "$opt" in
-#    h )
-#      >&2 echo -e "$usage_long" && exit 1
-#      exit 0
-#      ;;
-#    \?)
-#      >&2 echo -e "Unknown option: -$OPTARG"
-#      >&2 echo -e "$usage_short"
-#      exit 1
-#      ;;
-#    : )
-#      >&2 echo -e "Missing option argument for -$OPTARG"
-#      >&2 echo -e "$usage_short"
-#      exit 1
-#      ;;
-#    * )
-#      >&2 echo -e "Unimplemented option: -$OPTARG" && exit 1
-#      >&2 echo -e "$usage_short"
-#      exit 1
-#    esac
-#done
-
 tig-${command} "$@"

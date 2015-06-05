@@ -4,6 +4,16 @@
 # Authorize with tig and cloud providers
 
 set -e
+. "$HOME/.tigrc"
+
+install=false
+clone=false
+update=false
+reinstall=false
+delete=false
+start=false
+stop=false
+restart=false
 
 usage_short="${CYAN}Usage: tig-link [-i] [-c] [-u] [-f] [-d] [-s] [-z] [-r]${NC}"
 usage_long="$usage_short\n-i: Installs tig-link server."
@@ -17,16 +27,8 @@ usage_long="$usage_long\n-r: restarts tig-link server."
 
 usage_short="$usage_short\nUse -h to get supported command information."
 
-install=false
-clone=false
-update=false
-reinstall=false
-delete=false
-start=false
-stop=false
-restart=false
-
 options=":icufdszrh"
+shopt -u nocasematch
 OPTIND=1
 while getopts "$options" opt ; do
     case "$opt" in
@@ -75,7 +77,6 @@ while getopts "$options" opt ; do
     esac
 done
 shift $((OPTIND-1))
-
 
 src_root="$SRC_ROOT/tig-link"
 app_root="$LOCAL_ROOT/tig-link"

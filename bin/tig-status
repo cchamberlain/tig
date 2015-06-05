@@ -2,7 +2,7 @@
 #
 # Gets the current status of the module (git)
 
-. $HOME/.tigrc
+. "$HOME/.tigrc"
 
 ### if no arguments, throw an error
 if [ $# -eq 0 ]; then
@@ -10,7 +10,7 @@ if [ $# -eq 0 ]; then
   exit 1
 fi
 
-repo=$1
+repo="$1"
 module_root="$SRC_ROOT/$repo"
 # TODO make this use users default repos or full repo name
 module_url="$GIT_URL_BASE/cchamberlain/$repo"
@@ -21,7 +21,7 @@ if [ ! -d $module_root ]; then
   exit 1
 fi
 
-pushd $module_root >/dev/null
+pushd "$module_root" >/dev/null
   status=$(git status 2>&1)
   ahead_str="\t"
   if [[ $status == *"ahead"* ]] ; then

@@ -3,14 +3,15 @@
 set -e
 . "$HOME/.tigrc"
 
+flag=false
+
 usage_short="${CYAN}Usage: tig-***** [-f]"
-usage_long="$usage_short\n-f: ***Flag Description Here.${NC}"
+usage_long="$usage_short\n-f: ***Flag Description Here (default: $flag).${NC}"
 
 usage_short="$usage_short\nUse -h to get supported command information.${NC}"
 
-flag=false
-
 options=":fh"
+shopt -u nocasematch
 OPTIND=1
 while getopts "$options" opt ; do
     case "$opt" in
