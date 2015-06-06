@@ -33,22 +33,27 @@ if [ ! -f "$TIGRC_PATH" ] ; then
 fi
 . "$TIGRC_PATH"
 
+initialize_flag=false
 server_flag=false
 build_flag=false
 developer_flag=false
 
-usage_short="${BLUE}usage: tig install [-s] [-b] [-d]"
-usage_long="$usage_short\n-s: install optional developer components (default: $optional_flag)"
-usage_long="$usage_long\n-b: install optional developer components (default: $optional_flag)"
-usage_long="$usage_long\n-d: install optional developer components (default: $optional_flag)${NC}"
+usage_short="${BLUE}usage: tig install [-i] [-s] [-b] [-d]"
+usage_long="$usage_short\n-i: initialize core components (default: $initialize_flag)"
+usage_long="$usage_long\n-s: install web server components (default: $server_flag)"
+usage_long="$usage_long\n-b: install build server components (default: $build_flag)"
+usage_long="$usage_long\n-d: install developer components (default: $developer_flag)${NC}"
 
 usage_short="$usage_short\nuse -h to get supported command information${NC}"
 
-options=":sbdh"
+options=":isbdh"
 shopt -u nocasematch
 OPTIND=1
 while getopts "$options" opt ; do
     case "$opt" in
+    i )
+      exit 0;
+      ;;
     s )
       server_flag=true
       ;;
