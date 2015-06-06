@@ -7,14 +7,16 @@ set -e
 TIG_ROOT="${TIG_HOME-"$HOME/.tig"}"
 TIGRC_PATH="$TIG_ROOT/.tigrc"
 if [ ! -f "$TIGRC_PATH" ] ; then
-  src_root="$HOME/src"
-  if [ ! -d "$src_root/cchamberlain/tig" ] ; then
-    mkdir -p "$src_root/cchamberlain"
-    pushd "$src_root/cchamberlain"
-      git clone https://github.com/cchamberlain/tig
-    popd
+  TIG_CLONE_ROOT="$TIG_ROOT/tig"
+  TIG_CLONE_URL="https://github.com/cchamberlain/tig"
+  mkdir -p "$TIG_ROOT"
+  if [ ! -d "$TIG_CLONE_ROOT" ] ; then
+    pushd "$TIG_ROOT" >/dev/null
+      git clone "$TIG_CLONE_URL"
+    popd >/dev/null
   fi
-  cp "$src_root/cchamberlain/tig/lib/tigrc" "$TIGRC_PATH"
+  TIG_CLONE_RC_PATH="$TIG_CLONE_ROOT/lib/tigrc"
+  cp "$TIG_CLONE_RC_PATH" "$TIGRC_PATH"
 fi
 . "$TIGRC_PATH"
 
