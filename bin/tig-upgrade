@@ -11,10 +11,10 @@ TIGRC_PATH="$TIG_ROOT/.tigrc"
 
 flag=false
 
-usage_short="${CYAN}Usage: tig-***** [-f]"
-usage_long="$usage_short\n-f: ***Flag Description Here (default: $flag).${NC}"
+usage_short="${CYAN}usage: tig-***** [-f]"
+usage_long="$usage_short\n-f: ***flag Description Here (default: $flag)${NC}"
 
-usage_short="$usage_short\nUse -h to get supported command information.${NC}"
+usage_short="$usage_short\nuse -h to get supported command information${NC}"
 
 options=":fh"
 shopt -u nocasematch

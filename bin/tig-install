@@ -25,10 +25,10 @@ required_flag=false
 optional_flag=false
 
 usage_short="${BLUE}usage: tig install [-r] [-o]"
-usage_long="$usage_short\n-r: install required components (default: $required_flag).${NC}"
-usage_long="$usage_long\n-o: install optional components (default: $optional_flag).${NC}"
+usage_long="$usage_short\n-r: install required components (default: $required_flag)"
+usage_long="$usage_long\n-o: install optional components (default: $optional_flag)${NC}"
 
-usage_short="$usage_short\nUse -h to get supported command information.${NC}"
+usage_short="$usage_short\nuse -h to get supported command information${NC}"
 
 options=":roh"
 shopt -u nocasematch

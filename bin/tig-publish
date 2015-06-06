@@ -32,7 +32,7 @@ fi
 
 >&2 echo "publishing $repo at $module_path..."
 
-pushd $module_path >/dev/null
+pushd "$module_path" >/dev/null
 
 git add -A  #| grep -qi "fatal" && >&2 echo "An error occurred while git adding." && exit 1
 git commit -am "$commit_message"  #| grep -qi "fatal" && >&2 echo "An error occurred while git committing." && exit 1

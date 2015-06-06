@@ -18,17 +18,17 @@ start=false
 stop=false
 restart=false
 
-usage_short="${BLUE}Usage: tig-link [-I] [-C] [-U] [-R] [-d] [-s] [-z] [-r]"
-usage_long="$usage_short\n-I: Installs tig-link server."
-usage_long="$usage_long\n-C: Clones tig-link server (overwrites)."
-usage_long="$usage_long\n-U: Upgrades tig-link server."
-usage_long="$usage_long\n-R: Reinstall tig-link server (-D -> -I)."
-usage_long="$usage_long\n-D: Deletes tig-link server."
-usage_long="$usage_long\n-s: starts tig-link server."
-usage_long="$usage_long\n-z: stops tig-link server."
-usage_long="$usage_long\n-r: restarts tig-link server.${NC}"
+usage_short="${BLUE}usage: tig-link [-I] [-C] [-U] [-R] [-d] [-s] [-z] [-r]"
+usage_long="$usage_short\n-I: installs tig-link server"
+usage_long="$usage_long\n-C: clones tig-link server (overwrites)"
+usage_long="$usage_long\n-U: upgrades tig-link server"
+usage_long="$usage_long\n-R: reinstall tig-link server (-D -> -I)"
+usage_long="$usage_long\n-D: deletes tig-link server"
+usage_long="$usage_long\n-s: starts tig-link server"
+usage_long="$usage_long\n-z: stops tig-link server"
+usage_long="$usage_long\n-r: restarts tig-link server${NC}"
 
-usage_short="$usage_short\nUse -h to get supported command information.${NC}"
+usage_short="$usage_short\nuse -h to get supported command information${NC}"
 
 options=":icufdszrh"
 shopt -u nocasematch

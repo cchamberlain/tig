@@ -10,7 +10,7 @@ TIGRC_PATH="$TIG_ROOT/.tigrc"
 
 ### if no arguments, throw an error
 if [ $# -eq 0 ]; then
-  >&2 echo -e "${RED}--Must specify a module to check status for...--${NC}"
+  >&2 echo -e "${RED}- must specify a module to check status for... -${NC}"
   exit 1
 fi
 
@@ -20,15 +20,15 @@ module_root="$SRC_ROOT/$repo"
 module_url="$GIT_URL_BASE/cchamberlain/$repo"
 
 ### if module not cloned, throw an error
-if [ ! -d $module_root ]; then
-  >&2 echo -e "${RED}--Module $repo does not exist at $module_root...--${NC}"
+if [ ! -d "$module_root" ]; then
+  >&2 echo -e "${RED}- module $repo does not exist at $module_root... -${NC}"
   exit 1
 fi
 
 pushd "$module_root" >/dev/null
   status=$(git status 2>&1)
   ahead_str="\t"
-  if [[ $status == *"ahead"* ]] ; then
+  if [[ "$status" == *"ahead"* ]] ; then
     ahead_str="|A$(echo $status | grep ahead | tr '\n' ' ' | sed -e 's/[^0-9]/ /g' -e 's/^ *//g' -e 's/ *$//g' | tr -s ' ' | sed 's/ /\n/g')|\t"
   fi
   status_start="${ahead_str}${repo}"
