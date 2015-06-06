@@ -145,7 +145,7 @@ elif [ "$auth_type" = "bearer" ] ; then
   tig_response="$(curl -s -H "$bearer_token_header" -X POST "$tig_link_url")" 2>&1
   echo "$tig_response"
 else
-  >&2 echo "${RED}- must pass -u or -t flag... -${NC}"
+  >&2 echo -e "${RED}- must pass -u or -t flag... -${NC}"
   exit 1
 fi
 
