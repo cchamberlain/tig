@@ -82,7 +82,7 @@ if ! grep -q user.email <<< "$git_config" ; then
   >&2 echo "--No user email set in git global configuration--"
   >&2 echo -n "Your email address: "
   read git_email
-  >&2 git config --global user.email $git_email
+  >&2 git config --global user.email "$git_email"
 fi
 if ! grep -q credential.helper <<< "$git_config" ; then
   >&2 echo "--Git credential helper not configured, configuring now--"
@@ -94,7 +94,7 @@ if ! grep -q push.default <<< "$git_config" ; then
 fi
 
 ### If config file does not exist or does not contain the github token
-if [ "$renew" = true ] || [ ! -e "$TIGRC_PATH" ] || ! grep -q $GITHUB_TOKEN_KEY $TIGRC_PATH; then
+if [ "$renew" = true ] || [ ! -e "$TIGRC_PATH" ] || ! grep -q $GITHUB_TOKEN_KEY "$TIGRC_PATH"; then
     >&2 echo "--GitHub credentials are required to interact with the GitHub api--"
     >&2 echo "--Your basic credentials will be exchanged for a token and persisted to ${TIGRC_PATH}--"
 
