@@ -14,7 +14,7 @@ fi
 
 usage_short="${BLUE}Usage: tig <command> <opts>"
 
-usage_long="$usage_long\n\tinstall: initializes and installs required / optional tig components"
+usage_long="$usage_short\n\tinstall: initializes and installs required / optional tig components"
 usage_long="$usage_long\n\tlogin: authorize with the tig api"
 usage_long="$usage_long\n\tconfig: configure your tig settings"
 usage_long="$usage_long\n\ttrack: control the repos, scripts and dot files you are tracking"
