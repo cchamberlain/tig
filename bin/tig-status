@@ -2,7 +2,11 @@
 #
 # Gets the current status of the module (git)
 
-. "$HOME/.tigrc"
+set -e
+
+TIG_ROOT="${TIG_HOME-"$HOME/.tig"}"
+TIGRC_PATH="$TIG_ROOT/.tigrc"
+. "$TIGRC_PATH"
 
 ### if no arguments, throw an error
 if [ $# -eq 0 ]; then

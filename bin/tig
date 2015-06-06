@@ -3,17 +3,16 @@
 # This is the main tig script which acts as a proxy to the lower level tig scripts
 
 set -e
-OPTIND=1
 
-TIGRC_PATH="$HOME/.tigrc"
+TIG_ROOT="${TIG_HOME-"$HOME/.tig"}"
+TIGRC_PATH="$TIG_ROOT/.tigrc"
 if [ ! -f "$TIGRC_PATH" ] ; then
-  # Install required dependencies with init flag
-  tig-install -ir
+  tig-install -r
   . "$TIGRC_PATH"
 fi
 . "$TIGRC_PATH"
 
-usage_short="${CYAN}Usage: tig <command> <opts>${NC}"
+usage_short="${BLUE}Usage: tig <command> <opts>"
 
 usage_long="$usage_short\n--commands--"
 usage_long="$usage_long\n\tinstall: initializes and installs required / optional tig components."
@@ -25,17 +24,17 @@ usage_long="$usage_long\n\tstatus: get status and version info for your tracked 
 usage_long="$usage_long\n\tpublish: publish repositories to GitHub and npm with options for annotated versioning."
 usage_long="$usage_long\n\tbuild: Mesh and build one of your tracked repositories."
 usage_long="$usage_long\n\trun: Mesh, build, and execute one of your tracked repositories or scripts on your local machine."
-usage_long="$usage_long\n\tdeploy: Mesh, build, compress, and deploy artifacts to artifacts directory and cloud services."
+usage_long="$usage_long\n\tdeploy: Mesh, build, compress, and deploy artifacts to artifacts directory and cloud services.${NC}"
 
-usage_short="$usage_short\nUse -h to get supported command information."
+usage_short="$usage_short\nUse -h to get supported command information.${NC}"
 
+OPTIND=1
 if [ "$#" == "0" ] ; then
   >&2 echo -e "$usage_short"
   exit 1
 fi
 
-
-command=$1
+command="$1"
 shift
 
 if [ "$command" = "-h" ] ; then
@@ -43,4 +42,4 @@ if [ "$command" = "-h" ] ; then
   exit 0
 fi
 
-tig-${command} "$@"
+tig-"${command}" "$@"

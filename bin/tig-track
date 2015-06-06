@@ -1,7 +1,10 @@
 #!/bin/bash
 
 set -e
-. "$HOME/.tigrc"
+
+TIG_ROOT="${TIG_HOME-"$HOME/.tig"}"
+TIGRC_PATH="$TIG_ROOT/.tigrc"
+. "$TIGRC_PATH"
 
 flag=false
 

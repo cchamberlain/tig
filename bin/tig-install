@@ -2,7 +2,10 @@
 #
 # This script installs required applications
 
-TIGRC_PATH="$HOME/.tigrc"
+set -e
+
+TIG_ROOT="${TIG_HOME-"$HOME/.tig"}"
+TIGRC_PATH="$TIG_ROOT/.tigrc"
 if [ ! -f "$TIGRC_PATH" ] ; then
   src_root="$HOME/src"
   if [ ! -d "$src_root/cchamberlain/tig" ] ; then
@@ -13,111 +16,148 @@ if [ ! -f "$TIGRC_PATH" ] ; then
   fi
   cp "$src_root/cchamberlain/tig/lib/tigrc" "$TIGRC_PATH"
 fi
-
 . "$TIGRC_PATH"
 
->&2 echo "--Installing Required Applications--"
-if ! hash rimraf 2>/dev/null; then
-  >&2 echo "--Installing rimraf--"
-  >&2 echo "--**short for 'rm -rf' (remove recursive/force)**--"
-  npm install -g rimraf >/dev/null
+required_flag=false
+optional_flag=false
+
+usage_short="${BLUE}usage: tig install [-r] [-o]"
+usage_long="$usage_short\n-r: install required components (default: $required_flag).${NC}"
+usage_long="$usage_long\n-o: install optional components (default: $optional_flag).${NC}"
+
+usage_short="$usage_short\nUse -h to get supported command information.${NC}"
+
+options=":roh"
+shopt -u nocasematch
+OPTIND=1
+while getopts "$options" opt ; do
+    case "$opt" in
+    r )
+      required_flag=true
+      ;;
+    o )
+      optional_flag=true
+      ;;
+    h )
+      >&2 echo -e "$usage_long" && exit 1
+      exit 0
+      ;;
+    \?)
+      >&2 echo -e "Unknown option: -$OPTARG"
+      >&2 echo -e "$usage_short"
+      exit 1
+      ;;
+    : )
+      >&2 echo -e "Missing option argument for -$OPTARG"
+      >&2 echo -e "$usage_short"
+      exit 1
+      ;;
+    * )
+      >&2 echo -e "Unimplemented option: -$OPTARG" && exit 1
+      >&2 echo -e "$usage_short"
+      exit 1
+    esac
+done
+shift $((OPTIND-1))
+
+
+if [ "$required_flag" = true ] ; then
+
+  if ! hash rimraf 2>/dev/null; then
+    >&2 echo -e "${CYAN}- installing rimraf... -${NC}"
+    npm install -g rimraf >/dev/null
+    >&2 echo -e "${GREEN}- installing rimraf... -${NC}"
+  fi
+
+  if ! hash mkdirp 2>/dev/null; then
+    >&2 echo -e "${CYAN}- installing mkdirp... -${NC}"
+    npm install -g mkdirp >/dev/null
+    >&2 echo -e "${GREEN}- mkdirp installed successfully -${NC}"
+  fi
+
+  if ! hash jq 2>/dev/null; then
+    >&2 echo -e "${CYAN}- installing jq... -${NC}"
+    if [ "$PNAME" = "windows" ]; then
+      curl http://stedolan.github.io/jq/download/win64/jq.exe >"${LOCAL_BIN_ROOT}/jq.exe"
+    elif ! hash brew 2>/dev/null; then
+      brew install jq
+    else
+      curl http://stedolan.github.io/jq/download/linux64/jq >"${LOCAL_BIN_ROOT}/jq"
+    fi
+    >&2 echo -e "${GREEN}- jq installed successfully -${NC}"
+  fi
+
+  if ! hash chrome 2>/dev/null; then
+    if [ "$PNAME" = "windows" ]; then
+      >&2 echo -e "${CYAN}- installing chrome... -${NC}"
+      cinst google-chrome-x64 -yf
+      >&2 echo -e "${GREEN}- chrome installed successfully -${NC}"
+    fi
+  fi
+
 fi
-if ! hash mkdirp 2>/dev/null; then
-  >&2 echo "--Installing mkdirp--"
-  >&2 echo "--**short for 'mkdir -p' (make directory recursively and skip silently if directory exists)**--"
-  npm install -g mkdirp >/dev/null
-fi
-if ! hash jq 2>/dev/null; then
-  >&2 echo "--Installing jq--"
-  >&2 echo "--**makes working with json on the command line easier**--"
+
+
+if [ "$optional_flag" = true ] ; then
+
+  if ! hash atom 2>/dev/null; then
+    if [ "$PNAME" = "windows" ] ; then
+      >&2 echo -e "${CYAN}- installing atom... -${NC}"
+      cinst Atom -yf
+      >&2 echo -e "${GREEN}- atom installed successfully -${NC}"
+    fi
+  fi
+
+  if ! hash ack 2>/dev/null; then
+    >&2 echo -e "${CYAN}- installing ack... -${NC}"
+    curl http://beyondgrep.com/ack-2.14-single-file > "${LOCAL_BIN_ROOT}/ack"
+    >&2 echo -e "${GREEN}- ack installed successfully -${NC}"
+  fi
+
+  if ! hash nodemon 2>/dev/null; then
+    >&2 echo -e "${CYAN}- installing nodemon... -${NC}"
+    npm install -g nodemon >/dev/null
+    >&2 echo -e "${GREEN}- nodemon installed successfully -${NC}"
+  fi
+
+  if ! hash forever 2>/dev/null; then
+    >&2 echo -e "${CYAN}- installing forever... -${NC}"
+    npm install -g forever >/dev/null
+    >&2 echo -e "${GREEN}- forever installed successfully -${NC}"
+  fi
+
+  if ! hash ag 2>/dev/null; then
+    >&2 echo -e "${CYAN}- Installing ag (the silver searcher)... -${NC}"
+    if hash brew 2>/dev/null; then
+      brew install the_silver_searcher
+      >&2 echo -e "${GREEN}- ag installed successfully -${NC}"
+    elif hash pacman 2>/dev/null; then
+      pacman -S the_silver_searcher
+      >&2 echo -e "${GREEN}- ag installed successfully -${NC}"
+    elif hash choco 2>/dev/null; then
+      cinst ag -yf &>/dev/null
+      >&2 echo -e "${GREEN}- ag installed successfully -${NC}"
+    fi
+  fi
+
   if [ "$PNAME" = "windows" ]; then
-    curl http://stedolan.github.io/jq/download/win64/jq.exe >"${LOCAL_BIN_ROOT}/jq.exe"
-  elif ! hash brew 2>/dev/null; then
-    brew install jq
-  else
-    curl http://stedolan.github.io/jq/download/linux64/jq >"${LOCAL_BIN_ROOT}/jq"
-  fi
-fi
-if ! hash chrome 2>/dev/null; then
-  >&2 echo "--Installing chrome--"
-  if [ "$PNAME" = "windows" ]; then
-    choco install google-chrome-x64
-  fi
-fi
+    ### sysinternals: process explorer
+    if ! hash procmon 2>/dev/null ; then
+      >&2 echo -e "${CYAN}- installing sysinternals... -${NC}"
+      cinst sysinternals -yf
+      >&2 echo -e "${GREEN}- sysinternals installed successfully -${NC}"
+    fi
 
-
-
-#TODO: Put -o flag here
-echo "--Installing optional packages--"
-
-if ! hash ack 2>/dev/null; then
-  ### ack: Fast file searching
-  echo "Installing ack..."
-  curl http://beyondgrep.com/ack-2.14-single-file > "${LOCAL_BIN_ROOT}/ack"
-  echo "ack installed successfully."
-fi
-
-if ! hash nodemon 2>/dev/null; then
-  >&2 echo "--Installing nodemon--"
-  >&2 echo "--**runs node.js and watches server-side files for updates to trigger process reload**--"
-  npm install -g nodemon >/dev/null
-fi
-
-if ! hash forever 2>/dev/null; then
-  >&2 echo "--Installing forever--"
-  >&2 echo "--**runs node.js in a production setting, ensuring the process never goes down**--"
-  npm install -g forever >/dev/null
-fi
-
-if ! hash gulp 2>/dev/null; then
-  >&2 echo "--Installing gulp--"
-  npm install -g gulp >/dev/null
-fi
-
-if ! hash ag 2>/dev/null; then
-  >&2 echo "--Installing ag (the silver searcher)--"
-  if hash brew 2>/dev/null; then
-    brew install the_silver_searcher
-  elif hash pacman 2>/dev/null; then
-    pacman -S the_silver_searcher
-  elif hash choco 2>/dev/null; then
-    choco install ag --yes --force &>/dev/null
-  fi
-fi
-
-
-if [ "$PNAME" = "windows" ]; then
-  ### sysinternals: process explorer
-  ### Good for looking at windows processes, file locking, etc.
-  if ! hash procexp 2>/dev/null; then
-    >&2 echo "--Installing procexp--"
-    procexp_url="https://download.sysinternals.com/files/ProcessExplorer.zip"
-    procexp_path="${LOCAL_BIN_ROOT}/procexp.exe"
-    mkdir -p "$SRC_ZIP_ROOT"
-    pushd "$SRC_ZIP_ROOT"
-      curl -L $procexp_url >ProcessExplorer.zip
-      unzip -po ProcessExplorer.zip procexp.exe >$procexp_path
-    popd
+    if ! hash mongod 2>/dev/null; then
+      >&2 echo -e "${CYAN}- installing mongodb... -${NC}"
+      mkdirp "${SRC_BIN_ROOT}"
+      pushd "${SRC_BIN_ROOT}"
+        curl -L https://fastdl.mongodb.org/win32/mongodb-win32-x86_64-2008plus-ssl-3.0.3-signed.msi >mongodb_x86_64.msi
+        cmd //c msiexec.exe //q //i mongodb-3.0.3-signed.msi INSTALLLOCATION="%USERPROFILE%\\local\\mongodb"
+        mkdirp "${TIG_ROOT}/data/db"
+      popd
+      >&2 echo -e "${GREEN}- mongodb installed successfully -${NC}"
+    fi
   fi
 
-  if ! hash procmon 2>/dev/null; then
-    >&2 echo "--Installing procmon--"
-    procmon_url="https://download.sysinternals.com/files/ProcessMonitor.zip"
-    procmon_path="${LOCAL_BIN_ROOT}/procmon.exe"
-    mkdir -p "$SRC_BIN_ROOT"
-    pushd "$SRC_BIN_ROOT"
-      curl -L $procmon_url >ProcessMonitor.zip
-      unzip -po ProcessMonitor.zip Procmon.exe >$procmon_path
-    popd
-  fi
-
-  if ! hash mongod 2>/dev/null; then
-    >&2 echo "--Installing mongod--"
-    mkdirp "${SRC_BIN_ROOT}"
-    pushd "${SRC_BIN_ROOT}"
-      curl -L https://fastdl.mongodb.org/win32/mongodb-win32-x86_64-2008plus-ssl-3.0.3-signed.msi >mongodb_x86_64.msi
-      cmd //c msiexec.exe //q //i mongodb-3.0.3-signed.msi INSTALLLOCATION="%USERPROFILE%\\local\\mongodb"
-      mkdirp "${TIG_ROOT}/data/db"
-    popd
-  fi
 fi

@@ -2,7 +2,10 @@
 #
 # Git adds, commits, npm version, npm publishes, and git pushes the specified module directory.
 
-TIGRC_PATH="$HOME/.tigrc"
+set -e
+
+TIG_ROOT="${TIG_HOME-"$HOME/.tig"}"
+TIGRC_PATH="$TIG_ROOT/.tigrc"
 . "$TIGRC_PATH"
 
 ### if no arguments, throw an error

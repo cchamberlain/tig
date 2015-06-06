@@ -4,7 +4,10 @@
 # Authorize with tig and cloud providers
 
 set -e
-. "$HOME/.tigrc"
+
+TIG_ROOT="${TIG_HOME-"$HOME/.tig"}"
+TIGRC_PATH="$TIG_ROOT/.tigrc"
+. "$TIGRC_PATH"
 
 install=false
 clone=false

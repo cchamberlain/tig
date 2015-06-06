@@ -1,37 +1,41 @@
 #!/bin/bash
 #
-# tig-login [-n] [-a] [-t] username|organization
+# usage: tig login [-u username[:password]] [-t token] [-s url]
 # Authorize with tig and cloud providers
 
 set -e
 
-TIGRC_PATH="$HOME/.tigrc"
-if [ ! -f "$TIGRC_PATH" ] ; then
-  src_root="$HOME/src"
-  if [ ! -d "$src_root/cchamberlain/tig" ] ; then
-    mkdir -p "$src_root/cchamberlain"
-    pushd "$src_root/cchamberlain"
-      git clone https://github.com/cchamberlain/tig
-    popd
-  fi
-  cp "$src_root/cchamberlain/tig/lib/tigrc" "$TIGRC_PATH"
-fi
+TIG_ROOT="${TIG_HOME-"$HOME/.tig"}"
+TIGRC_PATH="$TIG_ROOT/.tigrc"
 . "$TIGRC_PATH"
 
-renew=false
+auth_type=""
+user_string=""
+token=""
+tig_link_url="http://tig.link"
 
-usage_short="${CYAN}Usage: tig-login [-r]"
-usage_long="$usage_short\n-r: Get a fresh token from GitHub."
+usage_short="${BLUE}usage: tig login [-u username[:password]] [-t token] [-s url]"
+usage_long="$usage_short\n-u: use basic auth to (re)authorize with github/tig api"
+usage_long="$usage_long\n-t: use bearer token authentication to (re)authorize with tig api"
+usage_long="$usage_long\n-s: override the tig link url (default: $tig_link_url)${NC}"
 
-usage_short="$usage_short\nUse -h to get supported command information."
+usage_short="$usage_short\nuse -h to get supported command information${NC}"
 
-options=":rh"
+options=":u:t:s:h"
 shopt -u nocasematch
 OPTIND=1
 while getopts "$options" opt ; do
     case "$opt" in
-    r ) # Gets latest annotated revision
-      renew=true
+    u )
+      auth_type="basic"
+      user_string="$OPTARG"
+      ;;
+    t )
+      auth_type="bearer"
+      token="$OPTARG"
+      ;;
+    s )
+      tig_link_url="$OPTARG"
       ;;
     h )
       >&2 echo -e "$usage_long" && exit 1
@@ -55,7 +59,6 @@ while getopts "$options" opt ; do
 done
 shift $((OPTIND-1))
 
-readonly GITHUB_TOKEN_KEY="GITHUB_TOKEN"
 
 ### --GIT CONFIG--
 ### Setup global git configuration if not set.
@@ -64,35 +67,89 @@ GIT_CONFIG_PATH="$HOME/.gitconfig"
 if [ ! -f "$GIT_CONFIG_PATH" ]; then
   >&2 touch "$GIT_CONFIG_PATH"
   >&2 clear
-  >&2 echo "--First time git setup--"
-  >&2 echo "--You will be prompted for information regarding your global git configuration--"
+  >&2 echo -e "${CYAN}- setting global git defaults... -${NC}"
 fi
+
+
+user_full_name=""
+user_email=""
 
 git_config=$(git config --global -l)
 
 if ! grep -q user.name <<< "$git_config" ; then
-  >&2 echo "--No user name set in git global configuration--"
-  >&2 echo -n "Your full name (e.g. 'John Doe'): "
-  read git_user
-  >&2 git config --global user.name "$git_user"
-fi
-if ! grep -q user.email <<< "$git_config" ; then
-  >&2 echo "--No user email set in git global configuration--"
-  >&2 echo -n "Your email address: "
-  read git_email
-  >&2 git config --global user.email "$git_email"
-fi
-if ! grep -q credential.helper <<< "$git_config" ; then
-  >&2 echo "--Git credential helper not configured, configuring now--"
-  >&2 git config --global credential.helper wincred
-fi
-if ! grep -q push.default <<< "$git_config" ; then
-  >&2 echo "--Git push default not set, configuring to simple--"
-  >&2 git config --global push.default simple
+  >&2 echo -e "${CYAN}- configuring git friendly user name... -${NC}"
+  while [ "$user_full_name" = "" ] ; do
+    >&2 echo -n "what is your full name (e.g. 'John Doe')? "
+    read user_full_name
+    if [ "$user_full_name" = "" ] ; then
+      >&2 echo -e "${RED}- that doesn't appear to be a name! try again... -${NC}"
+    fi
+  done
+  >&2 git config --global user.name "$user_full_name"
+  >&2 echo -e "${GREEN}- git friendly user name configured as $user_full_name -${NC}"
+else
+  user_full_name="$(git config --get --global user.name)"
 fi
 
-### If config file does not exist or does not contain the github token
-if [ "$renew" = true ] || [ ! -e "$TIGRC_PATH" ] || ! grep -q $GITHUB_TOKEN_KEY "$TIGRC_PATH"; then
+if ! grep -q user.email <<< "$git_config" ; then
+  >&2 echo -e "${CYAN}- configuring git email address... -${NC}"
+  while [ "$user_email" = "" ] ; do
+    >&2 echo -n "what is your email? "
+    read user_email
+    if [ "$user_email" = "" ] ; then
+      >&2 echo -e "${RED}- that doesn't appear to be an email address! try again... -${NC}"
+    fi
+  done
+  >&2 git config --global user.email "$user_email"
+  >&2 echo -e "${GREEN}- git email address configured as $user_email -${NC}"
+else
+  user_email="$(git config --get --global user.email)"
+fi
+
+
+if ! grep -q credential.helper <<< "$git_config" ; then
+  if [ "$PNAME" = "windows" ] ; then
+    >&2 echo -e "${CYAN}- configuring git credential helper... -${NC}"
+    >&2 git config --global credential.helper wincred
+    >&2 echo -e "${GREEN}- credential helper configured successfully -${NC}"
+  fi
+fi
+
+if ! grep -q push.default <<< "$git_config" ; then
+  >&2 echo -e "${CYAN}- configuring default git push behavior to simple... -${NC}"
+  >&2 git config --global push.default simple
+  >&2 echo -e "${GREEN}- git default push behavior configured successfully -${NC}"
+fi
+
+
+if [ "$auth_type" = "basic" ] ; then
+  username="$(echo "$user_string" | sed 's/[: ][\w[:punct:] ]+//')"
+  password="$(echo "$user_string" | sed 's/[\w[:punct:] ]+://')"
+
+  while [ "$password" = "" ] ; do
+    >&2 echo -n "enter your github password: "
+    read -s password
+    if [ "$password" = "" ] ; then
+      >&2 echo -e "${RED}- that doesn't appear to be a valid password! try again... -${NC}"
+    fi
+  done
+
+  tig_data="{\"full_name\":\"$user_full_name\",\"email\":\"$user_email\",\"hostname\":\"$(hostname)\",\"hostuser\":\"$(id -un)\",\"platform\":\"$PLATFORM\"}"
+
+  tig_credentials="$username:$password"
+
+  tig_response=$(curl -s -u ${tig_credentials} -X POST -d "$tig_data" "$tig_link_url") 2>&1
+  echo "$tig_response"
+elif [ "$auth_type" = "bearer" ] ; then
+  bearer_token_header="Authorization: Bearer $token"
+  tig_response="$(curl -s -H "$bearer_token_header" -X POST "$tig_link_url")" 2>&1
+  echo "$tig_response"
+else
+  >&2 echo "${RED}- must pass -u or -t flag... -${NC}"
+  exit 1
+fi
+
+if [ "$renew" = true ] ; then
     >&2 echo "--GitHub credentials are required to interact with the GitHub api--"
     >&2 echo "--Your basic credentials will be exchanged for a token and persisted to ${TIGRC_PATH}--"
 
@@ -128,7 +185,7 @@ if [ "$renew" = true ] || [ ! -e "$TIGRC_PATH" ] || ! grep -q $GITHUB_TOKEN_KEY 
             >&2 echo "--Token has already been granted for you but was lost.  Login to window at the right, revoke token named \"$oauth_note\", and close the window--"
             chrome_path="unknown"
             token_url="https://github.com/settings/tokens"
-            >&2 chrome-box "$token_url"
+            >&2 chrome "$token_url"
             ;;
           *Bad\ credentials*) ### Wrong username/password provided
             >&2 echo "--The username / password combination you provided was incorrect.  Try again--"
@@ -146,7 +203,7 @@ if [ "$renew" = true ] || [ ! -e "$TIGRC_PATH" ] || ! grep -q $GITHUB_TOKEN_KEY 
         do
          if [ ${#token} -eq 40 ]; then
             ### Set the github token in the config
-            echo -e "\r\nexport $GITHUB_TOKEN_KEY=\"$token\"\r\n" >>$TIGRC_PATH
+            echo -e "\r\nexport GITHUB_TOKEN=\"$token\"\r\n" >>$TIGRC_PATH
             GITHUB_AUTH_HEADER="Authorization: token $token"
             echo -e "\r\nexport GITHUB_AUTH_HEADER=\"$GITHUB_AUTH_HEADER\"\r\n" >>$TIGRC_PATH
             ### Replace github url with token github url in config
@@ -175,13 +232,13 @@ if [ "$renew" = true ] || [ ! -e "$TIGRC_PATH" ] || ! grep -q $GITHUB_TOKEN_KEY 
 fi
 
 ### Source the variable from the config file
-. "$TIGRC_PATH"
+#. "$TIGRC_PATH"
 
-if [ -n "$GITHUB_TOKEN" ]; then
+#if [ -n "$GITHUB_TOKEN" ]; then
     ### Update all github tokens
-    echo "$GITHUB_TOKEN" | tr -d '\n'
-    exit 0
-else
-    >&2 echo "--$GITHUB_TOKEN_KEY not found in the config file! Exiting...--"
-    exit 1
-fi
+    #echo "$GITHUB_TOKEN" | tr -d '\n'
+    #exit 0
+#else
+    #>&2 echo "--GITHUB_TOKEN not found in the config file! Exiting...--"
+    #exit 1
+#fi
