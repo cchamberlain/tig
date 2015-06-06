@@ -18,7 +18,7 @@ start=false
 stop=false
 restart=false
 
-usage_short="${BLUE}usage: tig-link [-I] [-C] [-U] [-R] [-d] [-s] [-z] [-r]"
+usage_short="${BLUE}usage: tig-link [-I] [-C] [-U] [-R] [-D] [-s] [-z] [-r]"
 usage_long="$usage_short\n-I: installs tig-link server"
 usage_long="$usage_long\n-C: clones tig-link server (overwrites)"
 usage_long="$usage_long\n-U: upgrades tig-link server"
@@ -30,7 +30,7 @@ usage_long="$usage_long\n-r: restarts tig-link server${NC}"
 
 usage_short="$usage_short\nuse -h to get supported command information${NC}"
 
-options=":icufdszrh"
+options=":ICURDszrh"
 shopt -u nocasematch
 OPTIND=1
 while getopts "$options" opt ; do
@@ -47,7 +47,7 @@ while getopts "$options" opt ; do
     R )
       reinstall=true
       ;;
-    d )
+    D )
       delete=true
       ;;
     s )
@@ -81,7 +81,7 @@ while getopts "$options" opt ; do
 done
 shift $((OPTIND-1))
 
-src_root="$SRC_ROOT/tig-link"
+src_root="$TIG_ROOT/tig-link"
 app_root="$LOCAL_ROOT/tig-link"
 app_lib_root="$app_root/lib"
 app_config_path="$app_root/.tig.json"
@@ -89,7 +89,8 @@ app_config_default_path="$app_lib_root/tig.json"
 
 if [ "$clone" = true ] ; then
   if [ -d "$src_root" ] ; then
-    >&2 echo -e "${RED}--tig-link is already cloned--${NC}"
+    >&2 echo -e "${RED}- tig-link is already cloned -${NC}"
+    exit 1
   else
     mkdirp "$SRC_ROOT"
     pushd "$SRC_ROOT" >/dev/null

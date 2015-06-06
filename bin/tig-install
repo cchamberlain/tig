@@ -1,17 +1,29 @@
 #!/bin/bash
 #
-# This script installs required applications
+# This script installs tig core files and components
 
 set -e
+
+if ! hash rimraf 2>/dev/null; then
+  >&2 echo -e "${CYAN}- installing rimraf... -${NC}"
+  npm install -g rimraf >/dev/null
+  >&2 echo -e "${GREEN}- rimraf installed successfully -${NC}"
+fi
+
+if ! hash mkdirp 2>/dev/null; then
+  >&2 echo -e "${CYAN}- installing mkdirp... -${NC}"
+  npm install -g mkdirp >/dev/null
+  >&2 echo -e "${GREEN}- mkdirp installed successfully -${NC}"
+fi
 
 TIG_ROOT="${TIG_HOME-"$HOME/.tig"}"
 TIGRC_PATH="$TIG_ROOT/.tigrc"
 if [ ! -f "$TIGRC_PATH" ] ; then
   TIG_CLONE_ROOT="$TIG_ROOT/tig"
   TIG_CLONE_URL="https://github.com/cchamberlain/tig"
-  mkdir -p "$TIG_ROOT" >/dev/null
+  mkdirp "$TIG_ROOT" >/dev/null
   if [ -d "$TIG_CLONE_ROOT" ] ; then
-    rmdir "$TIG_CLONE_ROOT" >/dev/null
+    rimraf "$TIG_CLONE_ROOT" >/dev/null
   fi
   pushd "$TIG_ROOT" >/dev/null
     git clone "$TIG_CLONE_URL" &>/dev/null
@@ -21,25 +33,33 @@ if [ ! -f "$TIGRC_PATH" ] ; then
 fi
 . "$TIGRC_PATH"
 
-required_flag=false
-optional_flag=false
+server_flag=false
+build_flag=false
+developer_flag=false
 
-usage_short="${BLUE}usage: tig install [-r] [-o]"
-usage_long="$usage_short\n-r: install required components (default: $required_flag)"
-usage_long="$usage_long\n-o: install optional components (default: $optional_flag)${NC}"
+usage_short="${BLUE}usage: tig install [-s] [-b] [-d]"
+usage_long="$usage_short\n-s: install optional developer components (default: $optional_flag)"
+usage_long="$usage_long\n-b: install optional developer components (default: $optional_flag)"
+usage_long="$usage_long\n-d: install optional developer components (default: $optional_flag)${NC}"
 
 usage_short="$usage_short\nuse -h to get supported command information${NC}"
 
-options=":roh"
+options=":sbdh"
 shopt -u nocasematch
 OPTIND=1
 while getopts "$options" opt ; do
     case "$opt" in
-    r )
-      required_flag=true
+    s )
+      server_flag=true
       ;;
-    o )
-      optional_flag=true
+    b )
+      build_flag=true
+      server_flag=true
+      ;;
+    d )
+      developer_flag=true
+      build_flag=true
+      server_flag=true
       ;;
     h )
       >&2 echo -e "$usage_long" && exit 1
@@ -64,19 +84,8 @@ done
 shift $((OPTIND-1))
 
 
-if [ "$required_flag" = true ] ; then
-
-  if ! hash rimraf 2>/dev/null; then
-    >&2 echo -e "${CYAN}- installing rimraf... -${NC}"
-    npm install -g rimraf >/dev/null
-    >&2 echo -e "${GREEN}- installing rimraf... -${NC}"
-  fi
-
-  if ! hash mkdirp 2>/dev/null; then
-    >&2 echo -e "${CYAN}- installing mkdirp... -${NC}"
-    npm install -g mkdirp >/dev/null
-    >&2 echo -e "${GREEN}- mkdirp installed successfully -${NC}"
-  fi
+if [ "$server_flag" = true ] ; then
+  >&2 echo -e "${CYAN}- installing web server components... -${NC}"
 
   if ! hash jq 2>/dev/null; then
     >&2 echo -e "${CYAN}- installing jq... -${NC}"
@@ -90,6 +99,18 @@ if [ "$required_flag" = true ] ; then
     >&2 echo -e "${GREEN}- jq installed successfully -${NC}"
   fi
 
+  >&2 echo -e "${GREEN}- finished installing web server components -${NC}"
+fi
+
+if [ "$build_flag" = true ] ; then
+  >&2 echo -e "${CYAN}- installing build server components... -${NC}"
+  >&2 echo -e "${GREEN}- finished installing build server components -${NC}"
+fi
+
+
+if [ "$developer_flag" = true ] ; then
+  >&2 echo -e "${CYAN}- installing developer components... -${NC}"
+
   if ! hash chrome 2>/dev/null; then
     if [ "$PNAME" = "windows" ]; then
       >&2 echo -e "${CYAN}- installing chrome... -${NC}"
@@ -97,11 +118,6 @@ if [ "$required_flag" = true ] ; then
       >&2 echo -e "${GREEN}- chrome installed successfully -${NC}"
     fi
   fi
-
-fi
-
-
-if [ "$optional_flag" = true ] ; then
 
   if ! hash atom 2>/dev/null; then
     if [ "$PNAME" = "windows" ] ; then
@@ -163,4 +179,5 @@ if [ "$optional_flag" = true ] ; then
     fi
   fi
 
+  >&2 echo -e "${GREEN}- finished installing developer components -${NC}"
 fi
