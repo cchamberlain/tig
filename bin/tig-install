@@ -104,11 +104,32 @@ if [ "$server_flag" = true ] ; then
     >&2 echo -e "${GREEN}- jq installed successfully -${NC}"
   fi
 
+  if ! hash forever 2>/dev/null ; then
+    >&2 echo -e "${CYAN}- installing forever... -${NC}"
+    if hash sudo 2>/dev/null ; then
+      sudo npm install -g forever
+    else
+      npm install -g forever
+    fi
+    >&2 echo -e "${GREEN}- forever installed successfully -${NC}"
+  fi
+
   >&2 echo -e "${GREEN}- finished installing web server components -${NC}"
 fi
 
 if [ "$build_flag" = true ] ; then
   >&2 echo -e "${CYAN}- installing build server components... -${NC}"
+
+  if ! hash gulp 2>/dev/null ; then
+    >&2 echo -e "${CYAN}- installing gulp... -${NC}"
+    if hash sudo 2>/dev/null ; then
+      sudo npm install -g gulp
+    else
+      npm install -g gulp
+    fi
+    >&2 echo -e "${GREEN}- gulp installed successfully -${NC}"
+  fi
+
   >&2 echo -e "${GREEN}- finished installing build server components -${NC}"
 fi
 

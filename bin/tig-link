@@ -107,23 +107,7 @@ if [ "$clone" = true ] ; then
 fi
 
 if [ "$install" = true ] ; then
-  if ! hash mkdirp 2>/dev/null ; then
-    >&2 echo "--Installing mkdirp...--"
-    if hash sudo 2>/dev/null ; then
-      sudo npm install -g mkdirp
-    else
-      npm install -g mkdirp
-    fi
-  fi
-
-  if ! hash forever 2>/dev/null ; then
-    >&2 echo "--Installing forever...--"
-    if hash sudo 2>/dev/null ; then
-      sudo npm install -g forever
-    else
-      npm install -g forever
-    fi
-  fi
+  tig install -s
 
   if [ ! -d "$app_root" ] ; then
     >&2 echo "--Cloning tig-link...--"
