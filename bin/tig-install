@@ -12,7 +12,7 @@ if [ ! -f "$TIGRC_PATH" ] ; then
   mkdir -p "$TIG_ROOT"
   if [ ! -d "$TIG_CLONE_ROOT" ] ; then
     pushd "$TIG_ROOT" >/dev/null
-      git clone "$TIG_CLONE_URL"
+      git clone "$TIG_CLONE_URL" &>/dev/null
     popd >/dev/null
   fi
   TIG_CLONE_RC_PATH="$TIG_CLONE_ROOT/lib/tigrc"
