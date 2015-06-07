@@ -48,7 +48,7 @@ usage_long="$usage_long\n-d: install developer components (default: $developer_f
 
 usage_short="$usage_short\nuse -h to get supported command information${NC}"
 
-options=":isbdh"
+options=":iwmbdh"
 shopt -u nocasematch
 OPTIND=1
 while getopts "$options" opt ; do
