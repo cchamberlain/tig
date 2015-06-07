@@ -30,6 +30,11 @@ usage_long="$usage_long\n-r: restarts tig-link server${NC}"
 
 usage_short="$usage_short\nuse -h to get supported command information${NC}"
 
+if [ "$#" == "0" ] ; then
+  >&2 echo -e "$usage_short"
+  exit 1
+fi
+
 options=":ICURDszrh"
 shopt -u nocasematch
 OPTIND=1
