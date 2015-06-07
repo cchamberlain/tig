@@ -21,5 +21,8 @@
     "url": "https://github.com/cchamberlain/tig/issues"
   },
   "homepage": "https://github.com/cchamberlain/tig",
-  "scripts": {}
+  "scripts": {},
+  "devDependencies": {
+    "marked-man": "^0.1.4"
+  }
 }
