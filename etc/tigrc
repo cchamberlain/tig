@@ -2,6 +2,11 @@
 #
 # Default for ~/.tigrc
 
+export TIG_ROOT="${TIG_HOME-"$HOME/.tig"}"
+export TIGRC_PATH="${TIG_ROOT}/tigrc"
+export TIG_JSON_PATH="${TIG_ROOT}/tig.json"
+export TIG_LINK_JSON_PATH="${TIG_ROOT}/tig-link.json"
+
 ### --PLATFORM--
 ### Figure out what platform this OS this is and standardize it
 
@@ -73,7 +78,8 @@ export WHITE='\033[1;37m'
 ### --URLs--
 ### Store any commonly used URLs here
 
-export TIG_URL_BASE="https://tig.link"
+export TIG_SH_URL_BASE="https://tig.sh"
+export TIG_LINK_URL_BASE="https://tig.link"
 export GIT_URL_BASE="https://github.com"
 export GIT_TIG_LINK_URL="${GIT_URL_BASE}/cchamberlain/tig-link"
 
@@ -81,9 +87,7 @@ export GIT_TIG_LINK_URL="${GIT_URL_BASE}/cchamberlain/tig-link"
 ### All paths are absolute.
 ### ROOT suffix => directory, PATH suffix => file
 
-
 export NPMRC_PATH="${HOME}/.npmrc"
-export TIGRC_PATH="${HOME}/.tigrc"
 
 # All source code gets installed here by default
 export SRC_ROOT="${HOME}/src"
@@ -91,7 +95,6 @@ export SRC_BIN_ROOT="${SRC_ROOT}/bin"
 
 export LOCAL_ROOT="${HOME}/local"
 export LOCAL_BIN_ROOT="${LOCAL_ROOT}/bin"
-export TIG_ROOT="${LOCAL_ROOT}/tig"
 
 # Code being prepared for build and other tasks gets synced here
 export SYNC_ROOT="${TIG_ROOT}/sync"
@@ -102,6 +105,5 @@ export BUILD_ROOT="${TIG_ROOT}/build"
 
 # After code has been built, artifact zips are deployed here.  Default format is 7z with highest compression.
 export ARTIFACTS_ROOT="${TIG_ROOT}/artifacts"
-
 
 
