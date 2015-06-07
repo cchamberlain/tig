@@ -1,6 +1,6 @@
 {
   "name": "tig",
-  "version": "0.1.36",
+  "version": "0.1.37",
   "description": "An abstraction layer to git.",
   "main": "index.js",
   "directories": {
