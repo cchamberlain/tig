@@ -91,13 +91,21 @@ app_root="$TIG_ROOT/tig-link"
 app_etc_root="$app_root/etc"
 app_config_default_path="$app_etc_root/tig-link.json"
 
-if [ "$configure" = true ] ; then
+reinstall_src() {
   if [ -d "$app_root" ] ; then
     rimraf "$app_root"
   fi
   mkdirp "$TIG_ROOT"
-  git clone "$GIT_TIG_LINK_URL" "$app_root"  &>/dev/null
+  pushd "$TIG_ROOT" >/dev/null
+    git clone "$GIT_TIG_LINK_URL"  &>/dev/null
+  popd >/dev/null
+}
 
+if [ ! -d "$app_root" ] || [ "$reinstall" = true ] ; then
+  reinstall_src
+fi
+
+if [ "$configure" = true ] ; then
   >&2 echo -e "${CYAN}- configuring tig-link... -${NC}"
   >&2 echo -n "jwt secret:"
   read jwt_secret
@@ -116,6 +124,7 @@ if [ "$configure" = true ] ; then
 fi
 
 if [ "$install" = true ] ; then
+
   if [ ! -d "$app_root" ] ; then
     >&2 echo -e "${CYAN}- tig-link not configured, use tig link -C... -${NC}"
     exit 1

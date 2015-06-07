@@ -1,6 +1,6 @@
 #!/bin/bash
 #
-# Default for ~/.tigrc
+# Default for ~/.tig/tigrc
 
 export TIG_ROOT="${TIG_HOME-"$HOME/.tig"}"
 export TIGRC_PATH="${TIG_ROOT}/tigrc"
