@@ -20,13 +20,13 @@ restart=false
 
 usage_short="${BLUE}usage: tig-link [-C] [-I] [-U] [-R] [-D] [-s] [-z] [-r]"
 usage_long="$usage_short\n-C: configures tig-link server (overwrites)"
-usage_long="$usage_long\n-I: installs tig-link server"
-usage_long="$usage_long\n-U: upgrades tig-link server"
-usage_long="$usage_long\n-R: reinstall tig-link server (-D -> -I)"
-usage_long="$usage_long\n-D: deletes tig-link server"
-usage_long="$usage_long\n-s: starts tig-link server"
-usage_long="$usage_long\n-z: stops tig-link server"
-usage_long="$usage_long\n-r: restarts tig-link server${NC}"
+usage_long="$usage_long\n-I: installs tig-link web server"
+usage_long="$usage_long\n-U: upgrades tig-link web server"
+usage_long="$usage_long\n-R: reinstall tig-link web server (-D -> -I)"
+usage_long="$usage_long\n-D: deletes tig-link web server"
+usage_long="$usage_long\n-s: starts tig-link web server"
+usage_long="$usage_long\n-z: stops tig-link web server"
+usage_long="$usage_long\n-r: restarts tig-link web server${NC}"
 
 usage_short="$usage_short\nuse -h to get supported command information${NC}"
 
@@ -35,7 +35,7 @@ if [ "$#" == "0" ] ; then
   exit 1
 fi
 
-options=":ICURDszrh"
+options=":CIURDszrh"
 shopt -u nocasematch
 OPTIND=1
 while getopts "$options" opt ; do
@@ -88,8 +88,8 @@ shift $((OPTIND-1))
 
 app_config_path="$TIG_ROOT/tig-link.json"
 app_root="$TIG_ROOT/tig-link"
-app_lib_root="$app_root/lib"
-app_config_default_path="$app_lib_root/tig-link.json"
+app_etc_root="$app_root/etc"
+app_config_default_path="$app_etc_root/tig-link.json"
 
 if [ "$configure" = true ] ; then
   if [ -d "$app_root" ] ; then
@@ -105,15 +105,11 @@ if [ "$configure" = true ] ; then
   read github_client_id
   >&2 echo -n "github client secret:"
   read github_client_secret
-  >&2 echo -n "mongo user:"
-  read mongo_user
-  >&2 echo -n "mongo password:"
-  read mongo_password
-  >&2 echo -n "mongo url:"
-  read mongo_url
+  >&2 echo -n "mongo connection string:"
+  read mongo_connection
 
   >&2 echo -e "${CYAN}- initializing $app_config_path -${NC}"
-  cat "$app_config_default_path" | sed -e "s/<jwt_secret>/$jwt_secret/" -e "s/<github_client_id>/$github_client_id/" -e "s/<github_client_secret>/$github_client_secret/" -e "s/<mongo_user>/$mongo_user/" -e "s/<mongo_password>/$mongo_password/" -e "s/<mongo_url>/$mongo_url/" >"$app_config_path"
+  cat "$app_config_default_path" | sed -e "s/<jwt_secret>/$jwt_secret/" -e "s/<github_client_id>/$github_client_id/" -e "s/<github_client_secret>/$github_client_secret/" -e "s/<mongo_connection>/$mongo_connection/"  >"$app_config_path"
 fi
 
 if [ "$install" = true ] ; then
@@ -122,7 +118,7 @@ if [ "$install" = true ] ; then
     exit 1
   fi
 
-  tig install -s
+  tig install -w
 
   pushd "$app_root" >/dev/null
     >&2 echo -e "${CYAN}- updating tig-link... -${NC}"

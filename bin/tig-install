@@ -34,13 +34,15 @@ fi
 . "$TIGRC_PATH"
 
 initialize_flag=false
-server_flag=false
+web_flag=false
+mongo_flag=false
 build_flag=false
 developer_flag=false
 
-usage_short="${BLUE}usage: tig install [-i] [-s] [-b] [-d]"
+usage_short="${BLUE}usage: tig install [-i] [-w] [-m] [-b] [-d]"
 usage_long="$usage_short\n-i: initialize core components (default: $initialize_flag)"
-usage_long="$usage_long\n-s: install web server components (default: $server_flag)"
+usage_long="$usage_long\n-w: install web server components (default: $web_flag)"
+usage_long="$usage_long\n-m: install mongodb server components (default: $mongo_flag)"
 usage_long="$usage_long\n-b: install build server components (default: $build_flag)"
 usage_long="$usage_long\n-d: install developer components (default: $developer_flag)${NC}"
 
@@ -55,16 +57,16 @@ while getopts "$options" opt ; do
       exit 0;
       ;;
     s )
-      server_flag=true
+      web_flag=true
       ;;
     b )
       build_flag=true
-      server_flag=true
+      web_flag=true
       ;;
     d )
       developer_flag=true
       build_flag=true
-      server_flag=true
+      web_flag=true
       ;;
     h )
       >&2 echo -e "$usage_long" && exit 1
@@ -89,7 +91,7 @@ done
 shift $((OPTIND-1))
 
 
-if [ "$server_flag" = true ] ; then
+if [ "$web_flag" = true ] ; then
   >&2 echo -e "${CYAN}- installing web server components... -${NC}"
 
   if ! hash jq 2>/dev/null; then
@@ -115,6 +117,21 @@ if [ "$server_flag" = true ] ; then
   fi
 
   >&2 echo -e "${GREEN}- finished installing web server components -${NC}"
+fi
+
+if [ "$mongo_flag" = true ] ; then
+  if ! hash mongod 2>/dev/null; then
+    if [ "$PNAME" = "windows" ] ; then
+      >&2 echo -e "${CYAN}- installing mongodb... -${NC}"
+      mkdirp "${SRC_BIN_ROOT}"
+      pushd "${SRC_BIN_ROOT}"
+        curl -L https://fastdl.mongodb.org/win32/mongodb-win32-x86_64-2008plus-ssl-3.0.3-signed.msi >mongodb_x86_64.msi
+        cmd //c msiexec.exe //q //i mongodb-3.0.3-signed.msi INSTALLLOCATION="%USERPROFILE%\\local\\mongodb"
+        mkdirp "${TIG_ROOT}/data/db"
+      popd
+      >&2 echo -e "${GREEN}- mongodb installed successfully -${NC}"
+    fi
+  fi
 fi
 
 if [ "$build_flag" = true ] ; then
@@ -193,16 +210,6 @@ if [ "$developer_flag" = true ] ; then
       >&2 echo -e "${GREEN}- sysinternals installed successfully -${NC}"
     fi
 
-    if ! hash mongod 2>/dev/null; then
-      >&2 echo -e "${CYAN}- installing mongodb... -${NC}"
-      mkdirp "${SRC_BIN_ROOT}"
-      pushd "${SRC_BIN_ROOT}"
-        curl -L https://fastdl.mongodb.org/win32/mongodb-win32-x86_64-2008plus-ssl-3.0.3-signed.msi >mongodb_x86_64.msi
-        cmd //c msiexec.exe //q //i mongodb-3.0.3-signed.msi INSTALLLOCATION="%USERPROFILE%\\local\\mongodb"
-        mkdirp "${TIG_ROOT}/data/db"
-      popd
-      >&2 echo -e "${GREEN}- mongodb installed successfully -${NC}"
-    fi
   fi
 
   >&2 echo -e "${GREEN}- finished installing developer components -${NC}"
