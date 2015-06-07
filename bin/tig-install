@@ -17,7 +17,7 @@ if ! hash mkdirp 2>/dev/null; then
 fi
 
 TIG_ROOT="${TIG_HOME-"$HOME/.tig"}"
-TIGRC_PATH="$TIG_ROOT/.tigrc"
+TIGRC_PATH="$TIG_ROOT/tigrc"
 if [ ! -f "$TIGRC_PATH" ] ; then
   TIG_CLONE_ROOT="$TIG_ROOT/tig"
   TIG_CLONE_URL="https://github.com/cchamberlain/tig"

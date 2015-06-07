@@ -5,7 +5,7 @@
 set -e
 
 TIG_ROOT="${TIG_HOME-"$HOME/.tig"}"
-TIGRC_PATH="$TIG_ROOT/.tigrc"
+TIGRC_PATH="$TIG_ROOT/tigrc"
 if [ ! -f "$TIGRC_PATH" ] ; then
   tig-install -i
   . "$TIGRC_PATH"

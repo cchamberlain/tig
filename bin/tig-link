@@ -6,7 +6,7 @@
 set -e
 
 TIG_ROOT="${TIG_HOME-"$HOME/.tig"}"
-TIGRC_PATH="$TIG_ROOT/.tigrc"
+TIGRC_PATH="$TIG_ROOT/tigrc"
 . "$TIGRC_PATH"
 
 install=false
@@ -18,9 +18,9 @@ start=false
 stop=false
 restart=false
 
-usage_short="${BLUE}usage: tig-link [-I] [-C] [-U] [-R] [-D] [-s] [-z] [-r]"
-usage_long="$usage_short\n-I: installs tig-link server"
-usage_long="$usage_long\n-C: clones tig-link server (overwrites)"
+usage_short="${BLUE}usage: tig-link [-C] [-I] [-U] [-R] [-D] [-s] [-z] [-r]"
+usage_long="$usage_short\n-C: configures tig-link server (overwrites)"
+usage_long="$usage_long\n-I: installs tig-link server"
 usage_long="$usage_long\n-U: upgrades tig-link server"
 usage_long="$usage_long\n-R: reinstall tig-link server (-D -> -I)"
 usage_long="$usage_long\n-D: deletes tig-link server"
@@ -35,11 +35,11 @@ shopt -u nocasematch
 OPTIND=1
 while getopts "$options" opt ; do
     case "$opt" in
+    C )
+      configure=true
+      ;;
     I )
       install=true
-      ;;
-    C )
-      clone=true
       ;;
     U )
       upgrade=true
@@ -81,70 +81,52 @@ while getopts "$options" opt ; do
 done
 shift $((OPTIND-1))
 
-src_root="$TIG_ROOT/tig-link"
-app_root="$LOCAL_ROOT/tig-link"
+app_config_path="$TIG_ROOT/tig-link.json"
+app_root="$TIG_ROOT/tig-link"
 app_lib_root="$app_root/lib"
-app_config_path="$app_root/.tig.json"
-app_config_default_path="$app_lib_root/tig.json"
+app_config_default_path="$app_lib_root/tig-link.json"
 
-if [ "$clone" = true ] ; then
-  if [ -d "$src_root" ] ; then
-    >&2 echo -e "${RED}- tig-link is already cloned -${NC}"
-    exit 1
-  else
-    mkdirp "$SRC_ROOT"
-    pushd "$SRC_ROOT" >/dev/null
-      >&2 echo -e "--Cloning tig-link to $src_root--"
-      git clone "$GIT_TIG_LINK_URL" &>/dev/null
-      pushd tig-link >/dev/null
-        >&2 echo -e "--npm installing...--"
-        npm install &>/dev/null
-        >&2 echo -e "${GREEN}--npm install finished--${GREEN}"
-      popd >/dev/null
-    popd >/dev/null
-    >&2 echo -e "${GREEN}--tig-link cloned successfully--${NC}"
+if [ "$configure" = true ] ; then
+  if [ -d "$app_root" ] ; then
+    rimraf "$app_root"
   fi
+  mkdirp "$TIG_ROOT"
+  git clone "$GIT_TIG_LINK_URL" "$app_root"  &>/dev/null
+
+  >&2 echo -e "${CYAN}- configuring tig-link... -${NC}"
+  >&2 echo -n "jwt secret:"
+  read jwt_secret
+  >&2 echo -n "github client id:"
+  read github_client_id
+  >&2 echo -n "github client secret:"
+  read github_client_secret
+  >&2 echo -n "mongo user:"
+  read mongo_user
+  >&2 echo -n "mongo password:"
+  read mongo_password
+  >&2 echo -n "mongo url:"
+  read mongo_url
+
+  >&2 echo -e "${CYAN}- initializing $app_config_path -${NC}"
+  cat "$app_config_default_path" | sed -e "s/<jwt_secret>/$jwt_secret/" -e "s/<github_client_id>/$github_client_id/" -e "s/<github_client_secret>/$github_client_secret/" -e "s/<mongo_user>/$mongo_user/" -e "s/<mongo_password>/$mongo_password/" -e "s/<mongo_url>/$mongo_url/" >"$app_config_path"
 fi
 
 if [ "$install" = true ] ; then
-  tig install -s
-
   if [ ! -d "$app_root" ] ; then
-    >&2 echo "--Cloning tig-link...--"
-    mkdirp "$LOCAL_ROOT"
-    pushd "$LOCAL_ROOT" >/dev/null
-      git clone https://github.com/cchamberlain/tig-link
-    popd >/dev/null
+    >&2 echo -e "${CYAN}- tig-link not configured, use tig link -C... -${NC}"
+    exit 1
   fi
 
+  tig install -s
+
   pushd "$app_root" >/dev/null
-    >&2 echo "--Updating tig-link...--"
+    >&2 echo -e "${CYAN}- updating tig-link... -${NC}"
     git pull origin master
-    >&2 echo "--Installing npm production dependencies...--"
+    >&2 echo -e "${CYAN}- installing npm production dependencies... -${NC}"
     npm install --production
+    >&2 echo -e "${GREEN}- tig-link server installed successfully -${NC}"
   popd >/dev/null
 fi
-
-
-if [ "$configure" = true ] || [ ! -f "$app_config_path" ] || [[ ! -s "$app_config_path" ]] ; then
-    >&2 echo "--Configuring tig-link...--"
-    >&2 echo -n "JWT Secret:"
-    read jwt_secret
-    >&2 echo -n "GitHub Client Id:"
-    read github_client_id
-    >&2 echo -n "GitHub Client Secret:"
-    read github_client_secret
-    >&2 echo -n "Mongo User:"
-    read mongo_user
-    >&2 echo -n "Mongo Password:"
-    read mongo_password
-    >&2 echo -n "Mongo Url:"
-    read mongo_url
-
-    >&2 echo "--Initializing $app_config_path--"
-    cat "$app_config_default_path" | sed -e "s/<jwt_secret>/$jwt_secret/" -e "s/<github_client_id>/$github_client_id/" -e "s/<github_client_secret>/$github_client_secret/" -e "s/<mongo_user>/$mongo_user/" -e "s/<mongo_password>/$mongo_password/" -e "s/<mongo_url>/$mongo_url/" >"$app_config_path"
-fi
-
 
 if [ "$start" = true ] ; then
   pushd "$app_root" >/dev/null
