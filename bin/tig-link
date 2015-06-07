@@ -105,11 +105,13 @@ if [ "$configure" = true ] ; then
   read github_client_id
   >&2 echo -n "github client secret:"
   read github_client_secret
-  >&2 echo -n "mongo connection string:"
-  read mongo_connection
+  >&2 echo -n "mongo credentials:"
+  read mongo_credentials
+  >&2 echo -n "mongo url:"
+  read mongo_url
 
   >&2 echo -e "${CYAN}- initializing $app_config_path -${NC}"
-  cat "$app_config_default_path" | sed -e "s/<jwt_secret>/$jwt_secret/" -e "s/<github_client_id>/$github_client_id/" -e "s/<github_client_secret>/$github_client_secret/" -e "s/<mongo_connection>/$mongo_connection/"  >"$app_config_path"
+  cat "$app_config_default_path" | sed -e "s/<jwt_secret>/$jwt_secret/" -e "s/<github_client_id>/$github_client_id/" -e "s/<github_client_secret>/$github_client_secret/" -e "s/<mongo_credentials>/$mongo_credentials/" -e "s/<mongo_url>/$mongo_url/"  >"$app_config_path"
 fi
 
 if [ "$install" = true ] ; then
