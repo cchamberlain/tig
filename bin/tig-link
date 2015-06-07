@@ -92,18 +92,18 @@ app_etc_root="$app_root/etc"
 app_config_default_path="$app_etc_root/tig-link.json"
 
 if [ ! -d "$app_root" ] || [ "$reinstall" = true ] ; then
-  if [ -d "$app_root" ] ; then
-    rimraf "$app_root"
-  fi
+  >&2 echo -e "${CYAN}- reinstalling tig-link... -${NC}"
+  rimraf "$app_root"
   mkdirp "$TIG_ROOT"
   pushd "$TIG_ROOT" >/dev/null
     git clone "$GIT_TIG_LINK_URL"  &>/dev/null
   popd >/dev/null
+  >&2 echo -e "${GREEN}- reinstalled $app_root -${NC}"
 fi
 
 if [ "$configure" = true ] ; then
-  rimraf "$app_config_path"
   >&2 echo -e "${CYAN}- configuring tig-link... -${NC}"
+  rimraf "$app_config_path"
   >&2 echo -n "jwt secret:"
   read jwt_secret
   >&2 echo -n "github client id:"
@@ -117,7 +117,7 @@ if [ "$configure" = true ] ; then
 
   cat "$app_config_default_path" | sed -e "s/<jwt_secret>/$jwt_secret/" -e "s/<github_client_id>/$github_client_id/" -e "s/<github_client_secret>/$github_client_secret/" -e "s/<mongo_credentials>/$mongo_credentials/" -e "s/<mongo_url>/$mongo_url/"  >"$app_config_path"
 
-  >&2 echo -e "${CYAN}- initialized $app_config_path -${NC}"
+  >&2 echo -e "${GREEN}- initialized $app_config_path -${NC}"
 fi
 
 if [ "$install" = true ] ; then
