@@ -56,8 +56,11 @@ while getopts "$options" opt ; do
     i )
       exit 0;
       ;;
-    s )
+    w )
       web_flag=true
+      ;;
+    m )
+      mongo_flag=true
       ;;
     b )
       build_flag=true
