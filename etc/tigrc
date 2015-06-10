@@ -45,7 +45,6 @@ case "$PLATFORM" in
   exit 1
 esac
 
-
 ### --OS INFO--
 ### Export all OS high level info here
 
