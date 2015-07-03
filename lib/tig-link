@@ -1,0 +1,145 @@
+#!/bin/bash
+#
+# tig-login [-n] [-a] [-t] username|organization
+# Authorize with tig and cloud providers
+
+set -e
+
+TIG_ROOT="${TIG_HOME-"$HOME/.tig"}"
+TIGRC_PATH="$TIG_ROOT/tigrc"
+. "$TIGRC_PATH"
+
+install=false
+clone=false
+upgrade=false
+reinstall=false
+delete=false
+start=false
+stop=false
+restart=false
+
+usage_short="${BLUE}usage: tig-link [-C] [-I] [-U] [-R] [-D] [-s] [-z] [-r]"
+usage_long="$usage_short\n-C: configures tig-link server (overwrites)"
+usage_long="$usage_long\n-I: installs tig-link web server"
+usage_long="$usage_long\n-U: upgrades tig-link web server"
+usage_long="$usage_long\n-R: reinstall tig-link web server (-D -> -I)"
+usage_long="$usage_long\n-D: deletes tig-link web server"
+usage_long="$usage_long\n-s: starts tig-link web server"
+usage_long="$usage_long\n-z: stops tig-link web server"
+usage_long="$usage_long\n-r: restarts tig-link web server${NC}"
+
+usage_short="$usage_short\nuse -h to get supported command information${NC}"
+
+if [ "$#" == "0" ] ; then
+  >&2 echo -e "$usage_short"
+  exit 1
+fi
+
+options=":CIURDszrh"
+shopt -u nocasematch
+OPTIND=1
+while getopts "$options" opt ; do
+    case "$opt" in
+    C )
+      configure=true
+      ;;
+    I )
+      install=true
+      ;;
+    U )
+      upgrade=true
+      ;;
+    R )
+      reinstall=true
+      ;;
+    D )
+      delete=true
+      ;;
+    s )
+      start=true
+      ;;
+    z )
+      stop=true
+      ;;
+    r )
+      restart=true
+      ;;
+    h )
+      >&2 echo -e "$usage_long" && exit 1
+      exit 0
+      ;;
+    \?)
+      >&2 echo -e "Unknown option: -$OPTARG"
+      >&2 echo -e "$usage_short"
+      exit 1
+      ;;
+    : )
+      >&2 echo -e "Missing option argument for -$OPTARG"
+      >&2 echo -e "$usage_short"
+      exit 1
+      ;;
+    * )
+      >&2 echo -e "Unimplemented option: -$OPTARG" && exit 1
+      >&2 echo -e "$usage_short"
+      exit 1
+    esac
+done
+shift $((OPTIND-1))
+
+app_config_path="$TIG_ROOT/tig-link.json"
+app_root="$TIG_ROOT/tig-link"
+app_etc_root="$app_root/etc"
+app_config_default_path="$app_etc_root/tig-link.json"
+
+if [ ! -d "$app_root" ] || [ "$reinstall" = true ] ; then
+  >&2 echo -e "${CYAN}- reinstalling tig-link... -${NC}"
+  rimraf "$app_root"
+  mkdirp "$TIG_ROOT"
+  pushd "$TIG_ROOT" >/dev/null
+    git clone "$GIT_TIG_LINK_URL"  &>/dev/null
+  popd >/dev/null
+  >&2 echo -e "${GREEN}- reinstalled $app_root -${NC}"
+fi
+
+if [ "$configure" = true ] ; then
+  >&2 echo -e "${CYAN}- configuring tig-link... -${NC}"
+  rimraf "$app_config_path"
+  >&2 echo -n "jwt secret:"
+  read jwt_secret
+  >&2 echo -n "github client id:"
+  read github_client_id
+  >&2 echo -n "github client secret:"
+  read github_client_secret
+  >&2 echo -n "mongo credentials:"
+  read mongo_credentials
+  >&2 echo -n "mongo url:"
+  read mongo_url
+
+  cat "$app_config_default_path" | sed -e "s/<jwt_secret>/$jwt_secret/" -e "s/<github_client_id>/$github_client_id/" -e "s/<github_client_secret>/$github_client_secret/" -e "s/<mongo_credentials>/$mongo_credentials/" -e "s/<mongo_url>/$mongo_url/"  >"$app_config_path"
+
+  >&2 echo -e "${GREEN}- initialized $app_config_path -${NC}"
+fi
+
+if [ "$install" = true ] ; then
+
+  if [ ! -d "$app_root" ] ; then
+    >&2 echo -e "${CYAN}- tig-link not configured, use tig link -C... -${NC}"
+    exit 1
+  fi
+
+  tig install -w
+
+  pushd "$app_root" >/dev/null
+    >&2 echo -e "${CYAN}- updating tig-link... -${NC}"
+    git pull origin master
+    >&2 echo -e "${CYAN}- installing npm production dependencies... -${NC}"
+    npm install --production
+    >&2 echo -e "${GREEN}- tig-link server installed successfully -${NC}"
+  popd >/dev/null
+fi
+
+if [ "$start" = true ] ; then
+  pushd "$app_root" >/dev/null
+    node server
+  popd >/dev/null
+fi

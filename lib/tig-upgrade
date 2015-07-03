@@ -1,0 +1,47 @@
+#!/bin/bash
+#
+# tig-upgrade
+# Upgrades tig to latest npm deployed version
+
+set -e
+
+TIG_ROOT="${TIG_HOME-"$HOME/.tig"}"
+TIGRC_PATH="$TIG_ROOT/tigrc"
+. "$TIGRC_PATH"
+
+flag=false
+
+usage_short="${CYAN}usage: tig-***** [-f]"
+usage_long="$usage_short\n-f: ***flag Description Here (default: $flag)${NC}"
+
+usage_short="$usage_short\nuse -h to get supported command information${NC}"
+
+options=":fh"
+shopt -u nocasematch
+OPTIND=1
+while getopts "$options" opt ; do
+    case "$opt" in
+    f )
+      flag=true
+      ;;
+    h )
+      >&2 echo -e "$usage_long" && exit 1
+      exit 0
+      ;;
+    \?)
+      >&2 echo -e "Unknown option: -$OPTARG"
+      >&2 echo -e "$usage_short"
+      exit 1
+      ;;
+    : )
+      >&2 echo -e "Missing option argument for -$OPTARG"
+      >&2 echo -e "$usage_short"
+      exit 1
+      ;;
+    * )
+      >&2 echo -e "Unimplemented option: -$OPTARG" && exit 1
+      >&2 echo -e "$usage_short"
+      exit 1
+    esac
+done
+shift $((OPTIND-1))
