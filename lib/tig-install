@@ -5,15 +5,15 @@
 set -e
 
 if ! hash rimraf 2>/dev/null; then
-  >&2 echo -e "${CYAN}- installing rimraf... -${NC}"
+  >&2 printf -- "%b- installing rimraf... -%b" "$CYAN" "$NC"
   npm install -g rimraf >/dev/null
-  >&2 echo -e "${GREEN}- rimraf installed successfully -${NC}"
+  >&2 printf -- "%b- rimraf installed successfully -%b" "$GREEN" "$NC"
 fi
 
 if ! hash mkdirp 2>/dev/null; then
-  >&2 echo -e "${CYAN}- installing mkdirp... -${NC}"
+  >&2 printf -- "%b- installing mkdirp... -%b" "$CYAN" "$NC"
   npm install -g mkdirp >/dev/null
-  >&2 echo -e "${GREEN}- mkdirp installed successfully -${NC}"
+  >&2 printf -- "%b- mkdirp installed successfully -%b" "$GREEN" "$NC"
 fi
 
 TIG_ROOT="${TIG_HOME-"$HOME/.tig"}"
@@ -95,10 +95,10 @@ shift $((OPTIND-1))
 
 
 if [ "$web_flag" = true ] ; then
-  >&2 echo -e "${CYAN}- installing web server components... -${NC}"
+  >&2 printf -- "%b- installing web server components... -%b" "$CYAN" "$NC"
 
   if ! hash jq 2>/dev/null; then
-    >&2 echo -e "${CYAN}- installing jq... -${NC}"
+    >&2 printf -- "%b- installing jq... -%b" "$CYAN" "$NC"
     if [ "$PNAME" = "windows" ]; then
       curl http://stedolan.github.io/jq/download/win64/jq.exe >"${LOCAL_BIN_ROOT}/jq.exe"
     elif ! hash brew 2>/dev/null; then
@@ -106,114 +106,114 @@ if [ "$web_flag" = true ] ; then
     else
       curl http://stedolan.github.io/jq/download/linux64/jq >"${LOCAL_BIN_ROOT}/jq"
     fi
-    >&2 echo -e "${GREEN}- jq installed successfully -${NC}"
+    >&2 printf -- "%b- jq installed successfully -%b" "$GREEN" "$NC"
   fi
 
   if ! hash forever 2>/dev/null ; then
-    >&2 echo -e "${CYAN}- installing forever... -${NC}"
+    >&2 printf -- "%b- installing forever... -%b" "$CYAN" "$NC"
     if hash sudo 2>/dev/null ; then
       sudo npm install -g forever
     else
       npm install -g forever
     fi
-    >&2 echo -e "${GREEN}- forever installed successfully -${NC}"
+    >&2 printf -- "%b- forever installed successfully -%b" "$GREEN" "$NC"
   fi
 
-  >&2 echo -e "${GREEN}- finished installing web server components -${NC}"
+  >&2 printf -- "%b- finished installing web server components -%b" "$GREEN" "$NC"
 fi
 
 if [ "$mongo_flag" = true ] ; then
   if ! hash mongod 2>/dev/null; then
     if [ "$PNAME" = "windows" ] ; then
-      >&2 echo -e "${CYAN}- installing mongodb... -${NC}"
+      >&2 printf -- "%b- installing mongodb... -%b" "$CYAN" "$NC"
       mkdirp "${SRC_BIN_ROOT}"
       pushd "${SRC_BIN_ROOT}"
         curl -L https://fastdl.mongodb.org/win32/mongodb-win32-x86_64-2008plus-ssl-3.0.3-signed.msi >mongodb_x86_64.msi
         cmd //c msiexec.exe //q //i mongodb-3.0.3-signed.msi INSTALLLOCATION="%USERPROFILE%\\local\\mongodb"
         mkdirp "${TIG_ROOT}/data/db"
       popd
-      >&2 echo -e "${GREEN}- mongodb installed successfully -${NC}"
+      >&2 printf -- "%b- mongodb installed successfully -%b" "$GREEN" "$NC"
     fi
   fi
 fi
 
 if [ "$build_flag" = true ] ; then
-  >&2 echo -e "${CYAN}- installing build server components... -${NC}"
+  >&2 printf -- "%b- installing build server components... -%b" "$CYAN" "$NC"
 
   if ! hash gulp 2>/dev/null ; then
-    >&2 echo -e "${CYAN}- installing gulp... -${NC}"
+    >&2 printf -- "%b- installing gulp... -%b" "$CYAN" "$NC"
     if hash sudo 2>/dev/null ; then
       sudo npm install -g gulp
     else
       npm install -g gulp
     fi
-    >&2 echo -e "${GREEN}- gulp installed successfully -${NC}"
+    >&2 printf -- "%b- gulp installed successfully -%b" "$GREEN" "$NC"
   fi
 
-  >&2 echo -e "${GREEN}- finished installing build server components -${NC}"
+  >&2 printf -- "%b- finished installing build server components -%b" "$GREEN" "$NC"
 fi
 
 
 if [ "$developer_flag" = true ] ; then
-  >&2 echo -e "${CYAN}- installing developer components... -${NC}"
+  >&2 printf -- "%b- installing developer components... -%b" "$CYAN" "$NC"
 
   if ! hash chrome 2>/dev/null; then
     if [ "$PNAME" = "windows" ]; then
-      >&2 echo -e "${CYAN}- installing chrome... -${NC}"
+      >&2 printf -- "%b- installing chrome... -%b" "$CYAN" "$NC"
       cinst google-chrome-x64 -yf
-      >&2 echo -e "${GREEN}- chrome installed successfully -${NC}"
+      >&2 printf -- "%b- chrome installed successfully -%b" "$GREEN" "$NC"
     fi
   fi
 
   if ! hash atom 2>/dev/null; then
     if [ "$PNAME" = "windows" ] ; then
-      >&2 echo -e "${CYAN}- installing atom... -${NC}"
+      >&2 printf -- "%b- installing atom... -%b" "$CYAN" "$NC"
       cinst Atom -yf
-      >&2 echo -e "${GREEN}- atom installed successfully -${NC}"
+      >&2 printf -- "%b- atom installed successfully -%b" "$GREEN" "$NC"
     fi
   fi
 
   if ! hash ack 2>/dev/null; then
-    >&2 echo -e "${CYAN}- installing ack... -${NC}"
+    >&2 printf -- "%b- installing ack... -%b" "$CYAN" "$NC"
     curl http://beyondgrep.com/ack-2.14-single-file > "${LOCAL_BIN_ROOT}/ack"
-    >&2 echo -e "${GREEN}- ack installed successfully -${NC}"
+    >&2 printf -- "%b- ack installed successfully -%b" "$GREEN" "$NC"
   fi
 
   if ! hash nodemon 2>/dev/null; then
-    >&2 echo -e "${CYAN}- installing nodemon... -${NC}"
+    >&2 printf -- "%b- installing nodemon... -%b" "$CYAN" "$NC"
     npm install -g nodemon >/dev/null
-    >&2 echo -e "${GREEN}- nodemon installed successfully -${NC}"
+    >&2 printf -- "%b- nodemon installed successfully -%b" "$GREEN" "$NC"
   fi
 
   if ! hash forever 2>/dev/null; then
-    >&2 echo -e "${CYAN}- installing forever... -${NC}"
+    >&2 printf -- "%b- installing forever... -%b" "$CYAN" "$NC"
     npm install -g forever >/dev/null
-    >&2 echo -e "${GREEN}- forever installed successfully -${NC}"
+    >&2 printf -- "%b- forever installed successfully -%b" "$GREEN" "$NC"
   fi
 
   if ! hash ag 2>/dev/null; then
-    >&2 echo -e "${CYAN}- Installing ag (the silver searcher)... -${NC}"
+    >&2 printf -- "%b- Installing ag (the silver searcher)... -%b" "$CYAN" "$NC"
     if hash brew 2>/dev/null; then
       brew install the_silver_searcher
-      >&2 echo -e "${GREEN}- ag installed successfully -${NC}"
+      >&2 printf -- "%b- ag installed successfully -%b" "$GREEN" "$NC"
     elif hash pacman 2>/dev/null; then
       pacman -S the_silver_searcher
-      >&2 echo -e "${GREEN}- ag installed successfully -${NC}"
+      >&2 printf -- "%b- ag installed successfully -%b" "$GREEN" "$NC"
     elif hash choco 2>/dev/null; then
       cinst ag -yf &>/dev/null
-      >&2 echo -e "${GREEN}- ag installed successfully -${NC}"
+      >&2 printf -- "%b- ag installed successfully -%b" "$GREEN" "$NC"
     fi
   fi
 
   if [ "$PNAME" = "windows" ]; then
     ### sysinternals: process explorer
     if ! hash procmon 2>/dev/null ; then
-      >&2 echo -e "${CYAN}- installing sysinternals... -${NC}"
+      >&2 printf -- "%b- installing sysinternals... -%b" "$CYAN" "$NC"
       cinst sysinternals -yf
-      >&2 echo -e "${GREEN}- sysinternals installed successfully -${NC}"
+      >&2 printf -- "%b- sysinternals installed successfully -%b" "$GREEN" "$NC"
     fi
 
   fi
 
-  >&2 echo -e "${GREEN}- finished installing developer components -${NC}"
+  >&2 printf -- "%b- finished installing developer components -%b" "$GREEN" "$NC"
 fi
